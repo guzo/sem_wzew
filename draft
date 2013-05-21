@@ -1,0 +1,514 @@
+#FIXME: zrodla
+
+o czym mowa
+	zalozenia
+		skrotowo - bo malo czasu
+		problematyczne zagadnienie
+			duzo "zaleznosci" miedzy tematami, kilka tematow pojawi sie w wielu miejscach - zaatakujemy je z roznych stron
+		glownie C{89,99}/C++{03,11}/assembler x86_64 (bo specyfika przedmiotu)
+			choc troche o pythonie, programowaniu funkcjonalnym i moze CUDA
+		przyklady gdzie mozliwe/wartosciowe
+		raczej standard jezyka, ale tez compiler-specific (GNU toolchain)
+		single-thread performance (bo czas i specyfika przedmiotu, mnogosc zagadnien zwiazanych z watkami)
+			x86{,-64} (bo czas i specyfika przedmiotu)
+		nie tylko automat: optymalizacja jako wspolpraca
+			inaczej seminarka bylaby sucha, bez zastosowania i bez sensu
+			"premature optimization is the root of all evil" -- Knuth
+				prawo Amdahla - mowi ze nie wszystko warto optymalizowac
+				profiler - mierzyc zeby wiedziec, nie zakladac: na ogol intuicje sa bledne
+					cachegrind, gprof
+				niektore aspekta lepiej zostawic kompilatorowi: przyklad
+					http://stackoverflow.com/questions/6120207/imul-or-shift-instruction
+					prezentacja o wstawkach: "jak widzielismy asm i nie jestesmy zadowoleni". "**widzielismy**" vs. "zdaje sie"
+						(a/=2) vs. (a >>=1) - nieaktualne, kompilator zrobi to lepiej i bedzie pamietal o signedness (i znal implementacje typu ze signedness, bo jest unspecified)
+			bedzie tez o sprzecie (tam zachodzi zaskakujaco wiele optymalizacji)
+				Zasada Moore'a - mamy do dyspozycji coraz wiecej tranzystorow
+				frequency wall - koniec skalowania pionowego
+				memory wall - "latency lags bandwidth"
+					powody
+				te 3 czynniki sprawiaja, ze coraz wiecej logiki na procesorze idzie w rozne sprytne techniki optymalizacji. Od prostych
+					SIMD
+				po skomplikowane
+					hierarchiczny cache
+					hierarchiczny TLB
+					pipelining i wszystko zwiazane z nim
+					delay slots
+						speculative execution
+							branch prediciton
+							register renaming...
+	definicja optymalizacji
+		zla nazwa - brak gwarancji optymalnego rozwiazania
+			stad powstanie dziedziny "superoptymalizacji"
+				exhaustive search, "startling bithacks"
+		"poprawa zgodnie z jakims kryterium ..."
+			typowo
+				szybsze wykonanie
+					na jakich danych?
+					na jakim sprzecie?
+					co nas spowalnia? data/memory bound
+					co mamy na mysli? high {performance,throughput,availability}/RT/...
+					stale ukryte w notacji O()
+						kiedy n*n serio zacznie byc wolniejszy od nlogn - przyklad z QS ktory ma fallback do n*n na malych podprzedzialach
+						heapsort wolniejszy od quicksorta bo posrednie adresowanie
+				mniejszy rozmiar
+					gdzie
+						mikrokontrolery, ogolnie ubogie proce - jak PicoBlaze
+						shellcode
+					czasem przyspiesza wykonanie, bo I$: http://lwn.net/Articles/534735/
+					-Os, upx
+				latwy debug
+					co utrudnia? oczywiste: inlining/reorder/elimination
+					-O0 vs. -Og
+				czas kompilacji
+					-Og
+					#!/usr/local/bin/tcc -run
+					C++: precompiled headers
+				jakosc obliczen
+					dokladnosc, powtarzalnosc
+					potrzebna wysoka (np. dla nauki):
+						https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+						alternatywy dla FP
+							 interval/ball arithmetics/fixed point
+						MAD/FMA
+						wolne subnormale
+					wystarczy niska (np. dla grafiki): -ffast-math
+				bezpieczenstwo:
+					aslr, dep
+					przeciwdzialanie "timing attacks"
+					proof of work/salting/bcrypt i pokrewne jako "odwrotna optymalizacja na poziomie algorytmu"
+			rzadziej
+				mniejsze zuzycie energii
+					obecnie: tanie liczenie, drogie transporty
+				tylko ascii printable chars: http://en.wikipedia.org/wiki/EICAR_test_file
+			nielatwo ustalic ktory zestaw technik da najlepszy wynik, bo optymalizacja to wysoce nieliniowy proces
+				tradeoffs
+					pamiec/obliczenia
+						dziala w 2 strony - czasem warto zachowac, czasem warto policzyc jeszcze raz
+					prosty, wysokopoziomowy przyklad: indeksy w bazach danych dlatego wlasnie: oplaca sie raz posortowac w O(nlogn) i potem szukac w O(logn) zamiast wiele razy szukac w O(n)
+				"paradoksy"
+					inline'owanie trywialnych funkcji czasem wbrew intuicji zmniejsza rozmiar
+					optymalizacja pod rozmiar moze przyspieszyc (I$)
+				"There is no benchmark but your benchmark" -- Alex Gaynor
+		"... ale ma zachowywac sie identycznie"
+			definicja "identycznego zachowania" z "The Problem With Threads", uwagi o wielowatkowosci
+			wynik wykonania powinien byc nierozroznialny od "nietykanego" kodu
+				poza wyjatkami w standardzie
+					C++: RVO, copy elision, http://www.reddit.com/r/cpp/comments/vdrpe/the_empty_base_optimization/
+				wywalanie delay loops - nic nie robia, nic nie widac, nie boli jak sie ich pozbedzie, prawda?
+				undefined behavior - wiecej pozniej
+					nasal deamons
+						comp.std.c “When the compiler encounters [a given undefined construct] it is legal for it to make demons fly out of your nose” [catb]
+						stary gcc uruchamial nethacka [wiki]
+					pointer access
+						out of bounds:
+							 value range propagation: http://www.reddit.com/r/programming/comments/1auk34/john_regehr_gcc_48_breaks_broken_spec_2006/
+						nullptr: https://isc.sans.edu/diary/A+new+fascinating+Linux+kernel+vulnerability/6820
+					memset
+						memset gets removed: http://www.viva64.com/en/b/0178/
+						why clean memory?: http://www.viva64.com/en/k/0041/
+					memcpy vs. memmove
+						http://lwn.net/Articles/414467/
+				leaky abstractions
+					kompilator nie moze usunac "0.0f" z a + 0.0f, bo 0.0f nie jest elementem neutralnym dodawania w IEEE754. Co wiecej: problemy z ieee754
+						http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
+				debugowanie a identycznosc: -Og
+		dziedziny pokrewne
+			static code analysis
+			object code optimization
+			link-time optimization
+			profile guided optimization
+			jit/realtime stuff
+			superoptimization
+co mozna wykorzystac
+	jezyk
+		C i C++
+			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
+				underhanded c contest: not likely to impress the judges w/ >300SLOC: "You can hide a semi truck in 300 lines of C"
+			undefined behavior - http://xkcd.com/292/
+				standard opisuje maszyne wirtualna
+					The semantic descriptions in this International Standard define a parameterized nondeterministic abstract machine.
+					Certain aspects and operations of the abstract machine are described in this International Standard as implementation-defined (for example, sizeof(int)). These constitute the parameters of the abstract machine. Each implementation shall include documentation describing its characteristics and behavior in these respects.
+					Certain other aspects and operations of the abstract machine are described in this International Standard as unspecified (for example, order of evaluation of arguments to a function). Where possible, this International Standard defines a set of allowable behaviors. These define the nondeterministic aspects of the abstract machine.
+					Certain other operations are described in this International Standard as undefined (for example, the effect of dereferencing the null pointer). [ Note: this International Standard imposes no requirements on the behavior of programs that contain undefined behavior. —end note ]
+				wykonanie: sequence points
+					java gwarantuje kolejnosc, C{,++} nie
+					definicje
+					przyklady
+						foo() + bar() + baz()
+					na co pozwala (tak, to nie jest zlosliwosc)
+						http://www.pvv.org/~oma/UnspecifiedAndUndefined_ACCU_Apr2013.pdf
+					c++11: zmiany (relacja "sequenced before")
+				pamiec:
+					aliasing
+						zasady w C (diff z C++?):
+							http://dbp-consulting.com/tutorials/StrictAliasing.html
+						rationale
+							zeby dalo sie korzystac z rejestrow a nie paranoja ze kazdy ptrwrite psuje wszystko
+						rozwiazania
+							memcpy
+								traktowane przez sprytny kompilator jako hint i wywalane
+								FIXME: przyklad
+							restrict
+								vs. FORTRAN
+							atrybuty
+								purity
+								malloc
+							mozliwie lokalne zmienne - wszystko moze siegac do globali, do lokali tylko "mniej lokalni"
+							zamiast kilku wskaznikow w 1 tablicy czasem lepiej 1 wskaznik i kilka offsetow
+								latwiej dla kompilatora udowodnic brak aliasingu
+							-fno-strict-aliasing # w druga strone
+								FIXME: test
+					alignment
+						zasady
+							malloc
+								The malloc() and calloc() functions return a pointer to the allocated memory that is suitably aligned for any kind of variable.
+							"Casting a pointer from one type to another is undefined behavior in C if it results in a pointer that is incorrectly aligned. The compiler is therefore allowed to assume all pointers are aligned correctly and generate code that crashes in this case."
+						timing, przepisac na memcpy:
+							http://www.reddit.com/r/programming/comments/1dq1h8/string_reversal_4x_faster/c9ssx25
+					reprezentacja specjalnych wartosci (np. true/false)
+						src/undef/true_true.c
+						ieee754, leaky abstractions (NIE undefined behavior)
+				http://stackoverflow.com/questions/98340/what-are-the-common-undefined-unspecified-behavior-for-c-that-you-run-into
+			slowa kluczowe
+				register/volatile - 2 przeciwienstwa
+				static (functions) - aggressive inlining
+				inline (od 99)
+					vs. makra
+					vs. c++
+					vs. szablony
+					nie jesli
+						rekursja
+						pobierany adres
+						uzyte vla
+		c++
+			kiedys: const/inline (teraz tez w c)
+			RVO/copy elision (!!!)
+			template (bo np. unrolling)
+			excep - better
+				The second scheme, and the one implemented in many production-quality C++ compilers, is a table-driven approach. This creates static tables at compile and link time that relate ranges of the program counter to the program state with respect to exception handling.[13] Then, if an exception is thrown, the runtime system looks up the current instruction location in the tables and determines what handlers are in play and what needs to be done. This approach minimizes executive overhead for the case where an exception is not thrown, albeit at the cost of some space, although said space can be allocated into read-only, special-purpose data sections that are not loaded or relocated until and unless an exception is thrown.[14] This second approach is also superior in terms of achieving thread safety[citation needed].
+		c++11
+			alignof/alignas [http://en.cppreference.com/w/cpp/language/alignas]
+			constexpr
+			move semantics
+			noexcept
+			http://en.wikipedia.org/wiki/C%2B%2B11#Modification_to_the_definition_of_plain_old_data
+		Domain Specific Languages
+	biblioteki
+		c++
+			sso (legality in 11)
+			cow (legality in 11)
+		c
+			http://software.intel.com/en-us/articles/memcpy-performance/
+			builtin [wiki]
+				Some compilers (for example, GCC[5]) provide built-in versions of many of the functions in the C standard library; that is, the implementations of the functions are written into the compiled object file, and the program calls the built-in versions instead of the functions in the C library shared object file. This reduces function call overhead, especially if function calls are replaced with inline variants, and allows other forms of optimization (as the compiler knows the control-flow characteristics of the built-in variants), but may cause confusion when debugging (for example, the built-in versions cannot be replaced with instrumented variants).
+				However, the built-in functions must behave like ordinary functions in accordance with ISO C. The main implication is that the program must be able to create a pointer to these functions by taking their address, and invoke the function by means of that pointer. If two pointers to the same function are derived in two different translation unit in the program, these two pointers must compare equal; that is, the address comes by resolving the name of the function, which has external (program-wide) linkage.
+		biblioteki numeryczne
+			problematyczna fuzja; rozwiazanie: halide
+	narzedzia
+		gprof/gcov - megawazne, bedzie jeszcze mowa przy kompilatorze
+		gdb
+			disasembler
+		valgrind
+			cachegrind - demo
+		upx
+		lepsza wspolpraca z kompilatorem ("compiler" - Latin "to pillage"), na przykladzie z gcc
+			Jak dziala: FE->IR->Optim->BE
+			flagi
+				oczywiste
+					profile: -p[g]
+					debug: -g[gdb], -Og
+					optymalizacja: -O{g,0,1,2,3}, -mtune=*, -mfpmath=*, -m{96,128}bit-long-double, -mx32, -ffast-math
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Optimize-Options.html
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/i386-and-x86_002d64-Options.html
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Code-Gen-Options.html
+					warningi: -Wall, -Wextra (tak, -Wall to nie wszystko), -Werror, -pedantic
+						-Wfloat-equal
+					-S -masm=intel
+				mniej oczywiste
+					-fprofile-arcs (feedback dla __builtin_expect), -fbranch-probabilities, -fprofile-dir, ...
+						todo: cross-profiling, ...
+					-fstack-usage
+					-ftree-vectorizer-verbose=
+					-fdump-tree-*=stderr
+						vectorize
+						optimize
+					-fopt-info-*
+						optimized
+						vec-missed # v >= 4.8
+					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Debugging-Options.html
+			wspolpraca z kompilatorem
+				intristics/builtins
+					__builtin_expect (G_UNLIKELY)
+						-fprofile-arcs
+					__builtin_cpu_supports("sse2") //gcc-4.8
+					vectorization
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html
+						http://gcc.gnu.org/projects/tree-ssa/lno.html
+						src/vec/sse.cpp
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/X86-Built_002din-Functions.html
+					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Target-Builtins.html
+					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Other-Builtins.html
+				language extension
+					gcc explicit reg vars: http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Explicit-Reg-Vars.html
+				#pragma
+					standard gwarantuje ignorowanie jesli nie sa rozpoznane
+					przyklady
+						openmp
+						icc ma mnostwo, szczegolnie dla architektury MIC
+							http://software.intel.com/en-us/articles/use-pragmas-with-the-intel-c-compiler-for-linux-on-64-bit-architecture
+							http://software.intel.com/sites/products/documentation/doclib/stdxe/2013/composerxe/compiler/cpp-lin/GUID-C2D70038-AED3-4E15-9B1A-0D9C24D9D714.htm
+				attributes
+					alternatywa dla #pragma
+						#pragma potrzebuje linijki, atrybut moze isc gdziekolwiek
+					niestandardowa skladnia, niestandardowe atrybuty, przyklad: gcc
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Function-Attributes.html
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Type-Attributes.html
+						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Variable-Attributes.html
+							vector: przyklad vec/sse.cpp
+						mnostwo rzeczy:
+							pure - troche jak w programowaniu funkcjonalnym, choc zrelaksowana definicja
+							noinline,alwaysinline - inline'owanie
+							fastcall/thiscall/... - wybor callconv
+							printf (stad kompilator ostrzega przy zlym uzyciu printfa)
+							malloc
+								http://pic.dhe.ibm.com/infocenter/comphelp/v121v141/index.jsp?topic=%2Fcom.ibm.xlc121.aix.doc%2Flanguage_ref%2Ffn_attrib_malloc.html
+							target - multiversioning (gcc-4.8, tylko c++)
+								src/vec/sse.cpp
+								http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Function-Multiversioning.html
+					standardowa skladnia, {nie,}standardowe atrybuty: c++11 [http://en.cppreference.com/w/cpp/language/attributes]
+						noreturn - funkcja nigdy nic nie zwraca (np. void foo(){throw 5;})
+						carries_dependency -
+	architektura
+		zrodla przyspieszenia
+			robienie szybciej: coraz trudniej, koniec skalowania czestotliwosci
+			robienie wiecej: ucieczka, Moore sie jeszcze trzyma
+				rownoleglosc
+					bit level - dosc standard (operujemy na slowach, nie bitach)
+					instruction level
+						dynamic - o tym sporo
+						static - itanium, lol
+					data level
+						simd
+					task level
+						not today
+		ogolnie
+			kiedys bylo prosciej
+				vertical scaling
+				MHz myth
+					deep pipelines
+				cheap loads, expensive compute => expensive loads, cheap compute
+			cisc vs. risc
+				cisc - easier to write by hand than risc
+				risc - small cpi (clk/instr), easier pipelining
+					delay slot
+			"walls"
+				power
+					frequency scaling
+				instruction-level parallelism
+					hit-under-miss cache
+					no-lockup cache
+					miss shadow
+					nadmiar rejestrow (> niz w "api", np. 27)
+						register renaming
+							ooo
+						bp => speculative exec
+							troche jak pamiec transakcyjna
+							"do it all, choose the result"
+							store buffer, L0 cache
+				memory
+					facebook's example with uint64toAscii
+						https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
+				predkosc swiatla
+					c ~ 3e8m/s => c ~ .1m/clk (@3GHz)
+						to wszystko w prozni, i zawyzone i nie wzielismy pod uwage tranzystorow => w praktyce wiele mniej
+		x86
+			wysoce optymalizowany pod przyspieszenie wykonania skalarnego
+			chcieli dobrze, ale mozna sie nadziac
+				cache - bo "latency lags bandwidth"
+					implementacja
+						sram vs. dram
+							schematy
+							refreshes, complicated logics (many truth levels) "decay"?
+						predkosci
+							register ~ 1clk
+							L1  ~      3clk
+							L2  ~     15clk
+							L3  ~ 50-100clk
+							mem ~    200clk
+						cache sa raczej per-core, na ogol LLC (lowest layer of cache) wspoldzielony, wraz zwarstwa zapewniajaca cache coherence
+							btw: modele pamieci (od strony jezyka), memory fences
+						cache line, associativity
+					"gallery of processor cache effects"
+					"cache oblivious algorithms"
+					"cache performance and optimizations of blocked algorithms"
+						matmul jako przyklad
+					wykres z "three beautiful quicksorts"
+					lokalnosc danych wazna: page coloring
+				simd
+					MMX - 64b
+					SSE - 128b
+					MMX - 256b
+					MIC's VPU - 512b
+					http://locklessinc.com/articles/vectorize/
+					autovectorization - Intel MIC
+				OOO exec/register renaming
+				prostsza matematyka
+					-fast-math, flush to 0, denorm, takietam
+					bitshifty zamiast mnozen
+				prefetching
+				pipelining
+					branch predictor
+						implementacja
+							maszyna stanow (diagram)
+							https://en.wikipedia.org/wiki/Branch_prediction_analysis_attacks#Side-channel_analysis_attacks
+						problemy
+							himrbp
+							jump i spill rejestrow
+							pipe flush
+						rozw
+							delay slots
+							instrukcje ktore robia compare i cos
+							inlining
+							unrolling
+				x86_64
+					nowe instrukcje, nowe rejestry (tak SIMD jak i general purpose, ktorych 2x wiecej)
+						fs/gs nieuzywane przez 	linucha, uzywa go pthreads
+							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
+							For instance, Microsoft Windows on x86-64 uses the GS segment to point to the Thread Environment Block, a small data structure for each thread, which contains information about exception handling, thread-local variables, and other per-thread state. Similarly, the Linux kernel uses the GS segment to store per-CPU data.
+						lea
+						podobno nikt nie optymalizuje sprzetu pod stare instrukcje z x86, szczegolnie x87 (ponoc 5x wolniej)
+							porownac -mfpmath={387,sse}
+							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
+porownanie, demo typowych optymalizacji
+	podzial
+		logicznie (dosc luzno, niekompletnie)
+			"etap projektowania"
+				wybor algorytmu/architektury
+					buffered vs. unbuffered
+						FIXME: przyklad
+					custom heap w QS: lepiej zmien kompilator jak robi to gorzej
+					heapsort vs. quicksort
+					za zapisem w jezyku wysokiego poziomu: kompilator jest sprytny
+					za zapisem w asm: Ty wiesz co chcesz
+				memory access patterns
+					cache-aware
+						liniowo (nie tylko tablice - struktury tez)
+						reuse (rejestry
+					prefetch (tez jawnie)
+						hierarchy
+							cache
+							tlb
+				lazy evaluation
+					futures/promises
+					async
+			"na poziomie kodu zrodlowego" - nie przesadzac - na ogol kompilator to zrobi
+				inlining
+					inlining jako "enabling transformation" dla zwijania/zabaw z rejestrami
+					kiedy
+						male funkcje (gettery w C++)
+						wiecej kodu na wywolanie i sprzatanie niz na funkcje
+						funkcje uzyte tylko raz (dla przejrzystosci)
+				loop unrolling
+					Duff's device
+						FIXME: przyklad
+					intel's (other vendors'?) #pargmas
+					macros (BOOST_PP)
+					templates
+				tail recursion elimination
+				factoring out of invariants
+				dead code elimination
+					dead store elimination
+				inline expansion
+					constexpr folding
+						const - nie do konca
+						constexpr (C++11)
+						metaprogramming
+							c++ templates
+								loop unrolling
+							macross
+								BOOST_PP
+				jump threading "merge instrukcji warunkowych"
+				test reordering
+				prefetching (choc efekt na poziomie asm)
+			na poziomie IR
+				available expression analysis
+				peephole/window optimization (kategoria)
+					strength reduction
+						uzycie wiekszych typow (procesor natywnie operuje na slowach => za male typy to casty w 2 strony)
+							<stdint.h>: [u]int_fast*_t - na x86_64 wszystkie defaultuja do long
+							definicja int ze standardu: "alias" dla long/short, zalezy co szybsze
+								"the int type in C is intended to be the best choice when one does not care about the range of a variable"
+							z drugiej strony: male typy i SIMD
+					constant folding/propagation
+				common subexpression elimination
+					partial redundancy elimination
+				fusion
+				live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
+				dead code elimination - powtorka
+				global value numbering
+				manifest expression
+					licznik petli w omp parallel for
+			na poziomie asm (przy przejsciu z IR)
+				register allocation
+				trace scheduling
+				instruction selection - jedna z metod strength reduction
+					lea zamiast prostych mnozen (bez side effcts, ustalone argumenty)
+						"Like any good optimization, it makes the implementation a bit messier, but doesn't affect the interface."
+					shifty zamiast mnozen/dzielen przez 2**n
+					xor reg, reg vs. mov reg, 0
+					"Division by Invariant Integers using Multiplication"
+					http://www.nynaeve.net/?p=64
+					przyklad: src/common/common_optimizations.c
+				strength reduction
+				dopasowanie pod arch
+				stack reuse
+				register reuse
+				callconvs
+				frame pointer omission
+				vectorization
+			wykonanie
+				jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
+				delikatniej: Profile guided optimization (o tym bedzie)
+				OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
+			procesor
+				cache
+				pipelining
+					branch predictor
+					speculative execution
+					register renaming
+		osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf
+			charakterystyka
+				to one przewaznie jedza duzo czasu i danych (szczegolnie w obliczeniach naukowych), wiec osobny dzial
+				silnie powiazane z architektura pamieci - przewaznie petle sluza do dostepu do niej
+				row/column major (C-like/FORTRAN,MATLAB)
+				aos/soa
+			metody
+				factoring out of invariants
+				loop-invariant code motion
+					int s = 0; for(int i; i < n; i++) s+=5; => int s = n*5
+				induction variable elimination
+					ogolniejszy przypadek powyzszego
+				rematerialization - obliczanie na nowo, bo dostep do pamieci jest drogi
+					troche jak xor reg, reg vs. mov reg, 0
+				bounds checking elimination
+				szczegolne przypadki
+					splitting - po roznych zakresach, np. osobna konwolucja w srodku/na brzegach
+					peeling - pojedyncze przypadki: rogi, brzegi w 1D
+					unswitching - osobne petle dla roznych przypadkow
+				cache
+					loop unrolling
+					loop fusion/fission
+					loop interchange
+						row/column major
+					tiling/loop nest optimization
+					stripmining
+				automatic parallelisation
+					dependence
+					aliasing
+				scheduling
+					//omp parallel for
+podsumowanie
+	zlozony temat
+	koniecznosc profilowania
+	coraz sprytniejsze kompilatory
+	RTFM
