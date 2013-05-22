@@ -1,8 +1,15 @@
 #FIXME: zrodla
+#FIXME: lang += types
+#FIXME: structure packing
+#FIXME: send https://github.com/torgiren/kernel/blob/master/wyklady/01_wprowadzenie_do_vim/01_wprowadzenie_do_vim.tex
 
 o czym mowa
 	zalozenia
 		skrotowo - bo malo czasu
+		dlaczego brak pomiarow
+			mierzymy tylko niektore rzeczy
+			niektore optymalizacje zbyt drobne by pomierzyc
+			poza tym niedeterministyczny charakter wspolczesnych prockow
 		problematyczne zagadnienie
 			duzo "zaleznosci" miedzy tematami, kilka tematow pojawi sie w wielu miejscach - zaatakujemy je z roznych stron
 		glownie C{89,99}/C++{03,11}/assembler x86_64 (bo specyfika przedmiotu)
@@ -32,7 +39,7 @@ o czym mowa
 					hierarchiczny cache
 					hierarchiczny TLB
 					pipelining i wszystko zwiazane z nim
-					delay slots
+						delay slots
 						speculative execution
 							branch prediciton
 							register renaming...
@@ -95,6 +102,9 @@ o czym mowa
 				poza wyjatkami w standardzie
 					C++: RVO, copy elision, http://www.reddit.com/r/cpp/comments/vdrpe/the_empty_base_optimization/
 				wywalanie delay loops - nic nie robia, nic nie widac, nie boli jak sie ich pozbedzie, prawda?
+				leaky abstractions
+					kompilator nie moze usunac "0.0f" z a + 0.0f, bo 0.0f nie jest elementem neutralnym dodawania w IEEE754. Co wiecej: problemy z ieee754
+						http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
 				undefined behavior - wiecej pozniej
 					nasal deamons
 						comp.std.c “When the compiler encounters [a given undefined construct] it is legal for it to make demons fly out of your nose” [catb]
@@ -108,14 +118,13 @@ o czym mowa
 						why clean memory?: http://www.viva64.com/en/k/0041/
 					memcpy vs. memmove
 						http://lwn.net/Articles/414467/
-				leaky abstractions
-					kompilator nie moze usunac "0.0f" z a + 0.0f, bo 0.0f nie jest elementem neutralnym dodawania w IEEE754. Co wiecej: problemy z ieee754
-						http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
 				debugowanie a identycznosc: -Og
 		dziedziny pokrewne
 			static code analysis
 			object code optimization
 			link-time optimization
+				http://gcc.gnu.org/wiki/LinkTimeOptimization
+				http://llvm.org/docs/LinkTimeOptimization.html
 			profile guided optimization
 			jit/realtime stuff
 			superoptimization
@@ -132,6 +141,7 @@ co mozna wykorzystac
 					Certain other operations are described in this International Standard as undefined (for example, the effect of dereferencing the null pointer). [ Note: this International Standard imposes no requirements on the behavior of programs that contain undefined behavior. —end note ]
 				wykonanie: sequence points
 					java gwarantuje kolejnosc, C{,++} nie
+						i = ++i;
 					definicje
 					przyklady
 						foo() + bar() + baz()
@@ -172,6 +182,7 @@ co mozna wykorzystac
 			slowa kluczowe
 				register/volatile - 2 przeciwienstwa
 				static (functions) - aggressive inlining
+				switch - "most high-level feature of c"
 				inline (od 99)
 					vs. makra
 					vs. c++
@@ -180,11 +191,12 @@ co mozna wykorzystac
 						rekursja
 						pobierany adres
 						uzyte vla
+						switche
 		c++
-			kiedys: const/inline (teraz tez w c)
+			kiedys: const (prawdziwy)/inline (teraz tez w c)
 			RVO/copy elision (!!!)
 			template (bo np. unrolling)
-			excep - better
+			exceptions - better
 				The second scheme, and the one implemented in many production-quality C++ compilers, is a table-driven approach. This creates static tables at compile and link time that relate ranges of the program counter to the program state with respect to exception handling.[13] Then, if an exception is thrown, the runtime system looks up the current instruction location in the tables and determines what handlers are in play and what needs to be done. This approach minimizes executive overhead for the case where an exception is not thrown, albeit at the cost of some space, although said space can be allocated into read-only, special-purpose data sections that are not loaded or relocated until and unless an exception is thrown.[14] This second approach is also superior in terms of achieving thread safety[citation needed].
 		c++11
 			alignof/alignas [http://en.cppreference.com/w/cpp/language/alignas]
@@ -206,10 +218,9 @@ co mozna wykorzystac
 			problematyczna fuzja; rozwiazanie: halide
 	narzedzia
 		gprof/gcov - megawazne, bedzie jeszcze mowa przy kompilatorze
+			valgrind: cachegrind - demo
 		gdb
 			disasembler
-		valgrind
-			cachegrind - demo
 		upx
 		lepsza wspolpraca z kompilatorem ("compiler" - Latin "to pillage"), na przykladzie z gcc
 			Jak dziala: FE->IR->Optim->BE
@@ -223,18 +234,21 @@ co mozna wykorzystac
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Code-Gen-Options.html
 					warningi: -Wall, -Wextra (tak, -Wall to nie wszystko), -Werror, -pedantic
 						-Wfloat-equal
+						standard nie kaze - kompilator ma byc prosty
 					-S -masm=intel
 				mniej oczywiste
-					-fprofile-arcs (feedback dla __builtin_expect), -fbranch-probabilities, -fprofile-dir, ...
-						todo: cross-profiling, ...
-					-fstack-usage
-					-ftree-vectorizer-verbose=
-					-fdump-tree-*=stderr
-						vectorize
-						optimize
-					-fopt-info-*
-						optimized
-						vec-missed # v >= 4.8
+					pgo
+						-fprofile-arcs (feedback dla __builtin_expect) # necessary?: -fbranch-probabilities, ...
+							todo: cross-profiling, ...
+					info
+						-fstack-usage
+						-ftree-vectorizer-verbose=
+						-fdump-tree-*=stderr
+							vectorize
+							optimize
+						-fopt-info-*
+							optimized
+							vec-missed # v >= 4.8
 					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Debugging-Options.html
 			wspolpraca z kompilatorem
 				intristics/builtins
@@ -250,8 +264,10 @@ co mozna wykorzystac
 					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Other-Builtins.html
 				language extension
 					gcc explicit reg vars: http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Explicit-Reg-Vars.html
+					extended asm
 				#pragma
 					standard gwarantuje ignorowanie jesli nie sa rozpoznane
+						ew warning
 					przyklady
 						openmp
 						icc ma mnostwo, szczegolnie dla architektury MIC
@@ -339,40 +355,41 @@ co mozna wykorzystac
 							btw: modele pamieci (od strony jezyka), memory fences
 						cache line, associativity
 					"gallery of processor cache effects"
-					"cache oblivious algorithms"
 					"cache performance and optimizations of blocked algorithms"
 						matmul jako przyklad
+					"cache oblivious algorithms"
 					wykres z "three beautiful quicksorts"
 					lokalnosc danych wazna: page coloring
 				simd
 					MMX - 64b
 					SSE - 128b
-					MMX - 256b
+					AVX - 256b
 					MIC's VPU - 512b
 					http://locklessinc.com/articles/vectorize/
 					autovectorization - Intel MIC
-				OOO exec/register renaming
 				prostsza matematyka
 					-fast-math, flush to 0, denorm, takietam
 					bitshifty zamiast mnozen
-				prefetching
-				pipelining
-					branch predictor
-						implementacja
-							maszyna stanow (diagram)
-							https://en.wikipedia.org/wiki/Branch_prediction_analysis_attacks#Side-channel_analysis_attacks
-						problemy
-							himrbp
-							jump i spill rejestrow
-							pipe flush
-						rozw
-							delay slots
-							instrukcje ktore robia compare i cos
-							inlining
-							unrolling
+				ilp
+					OOO exec/register renaming
+					prefetching
+					pipelining
+						branch predictor
+							implementacja
+								maszyna stanow (diagram)
+								https://en.wikipedia.org/wiki/Branch_prediction_analysis_attacks#Side-channel_analysis_attacks
+							problemy
+								himrbp
+								jump i spill rejestrow
+								pipe flush
+							rozw
+								delay slots
+								instrukcje ktore robia compare i cos
+								inlining
+								unrolling
 				x86_64
 					nowe instrukcje, nowe rejestry (tak SIMD jak i general purpose, ktorych 2x wiecej)
-						fs/gs nieuzywane przez 	linucha, uzywa go pthreads
+						malo rejestrow w x86: fs/gs nieuzywane przez linucha, uzywa go pthreads
 							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
 							For instance, Microsoft Windows on x86-64 uses the GS segment to point to the Thread Environment Block, a small data structure for each thread, which contains information about exception handling, thread-local variables, and other per-thread state. Similarly, the Linux kernel uses the GS segment to store per-CPU data.
 						lea
@@ -393,7 +410,7 @@ porownanie, demo typowych optymalizacji
 				memory access patterns
 					cache-aware
 						liniowo (nie tylko tablice - struktury tez)
-						reuse (rejestry
+						reuse (rejestry)
 					prefetch (tez jawnie)
 						hierarchy
 							cache
@@ -406,8 +423,8 @@ porownanie, demo typowych optymalizacji
 					inlining jako "enabling transformation" dla zwijania/zabaw z rejestrami
 					kiedy
 						male funkcje (gettery w C++)
-						wiecej kodu na wywolanie i sprzatanie niz na funkcje
-						funkcje uzyte tylko raz (dla przejrzystosci)
+							wiecej kodu na wywolanie i sprzatanie niz na funkcje
+						funkcje uzyte tylko raz (dla przejrzystosci) (static)
 				loop unrolling
 					Duff's device
 						FIXME: przyklad
@@ -416,7 +433,7 @@ porownanie, demo typowych optymalizacji
 					templates
 				tail recursion elimination
 				factoring out of invariants
-				dead code elimination
+				dead code elimination - czasem boli
 					dead store elimination
 				inline expansion
 					constexpr folding
@@ -432,6 +449,7 @@ porownanie, demo typowych optymalizacji
 				prefetching (choc efekt na poziomie asm)
 			na poziomie IR
 				available expression analysis
+				live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
 				peephole/window optimization (kategoria)
 					strength reduction
 						uzycie wiekszych typow (procesor natywnie operuje na slowach => za male typy to casty w 2 strony)
@@ -442,8 +460,6 @@ porownanie, demo typowych optymalizacji
 					constant folding/propagation
 				common subexpression elimination
 					partial redundancy elimination
-				fusion
-				live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
 				dead code elimination - powtorka
 				global value numbering
 				manifest expression
@@ -467,15 +483,9 @@ porownanie, demo typowych optymalizacji
 				frame pointer omission
 				vectorization
 			wykonanie
-				jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
-				delikatniej: Profile guided optimization (o tym bedzie)
-				OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
-			procesor
-				cache
-				pipelining
-					branch predictor
-					speculative execution
-					register renaming
+				VM: jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
+				kompilator: delikatniej: Profile guided optimization (o tym bedzie)
+				CPU: OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
 		osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf
 			charakterystyka
 				to one przewaznie jedza duzo czasu i danych (szczegolnie w obliczeniach naukowych), wiec osobny dzial
@@ -491,7 +501,7 @@ porownanie, demo typowych optymalizacji
 				rematerialization - obliczanie na nowo, bo dostep do pamieci jest drogi
 					troche jak xor reg, reg vs. mov reg, 0
 				bounds checking elimination
-				szczegolne przypadki
+				obsluga szczegolnych przypadkow
 					splitting - po roznych zakresach, np. osobna konwolucja w srodku/na brzegach
 					peeling - pojedyncze przypadki: rogi, brzegi w 1D
 					unswitching - osobne petle dla roznych przypadkow
