@@ -3,7 +3,7 @@
 o czym mowa
 	zalozenia
 		skrotowo - bo malo czasu
-			FIXME: do konsultacji: nie powiemy wszystkiego, ale zostawimy tematy do obczajenia we wlasnym zakresie
+			nie powiemy wszystkiego, ale zostawimy tematy do obczajenia we wlasnym zakresie
 			single-thread performance (bo czas i specyfika przedmiotu, mnogosc zagadnien zwiazanych z watkami)
 				x86{,-64} (bo czas i specyfika przedmiotu)
 			glownie C{89,99}/C++{03,11}/assembler x86_64 (bo specyfika przedmiotu)
@@ -15,7 +15,7 @@ o czym mowa
 			nie wszedzie pomiary
 				niektore optymalizacje zbyt drobne by pomierzyc
 					niedeterministyczny charakter wspolczesnych procesorow
-		nie tylko automat: optymalizacja jako wspolpraca
+		wysek: nie tylko automat: optymalizacja jako wspolpraca
 			inaczej seminarka bylaby sucha, bez zastosowania i bez sensu
 			"premature optimization is the root of all evil" -- Knuth - IMPORTANT
 				prawo Amdahla - mowi ze nie wszystko warto optymalizowac
@@ -74,7 +74,7 @@ o czym mowa
 				"paradoksy"
 					inline'owanie trywialnych funkcji czasem wbrew intuicji zmniejsza rozmiar
 					optymalizacja pod rozmiar moze przyspieszyc (I$)
-		"... ale ma zachowywac sie identycznie" - IMPORTANT
+		guzo: "... ale ma zachowywac sie identycznie" - IMPORTANT
 			definicja "identycznego zachowania" z "The Problem With Threads", uwagi o wielowatkowosci
 			wynik wykonania powinien byc nierozroznialny od "nietykanego" kodu
 				poza wyjatkami w standardzie
@@ -131,7 +131,7 @@ co mozna wykorzystac
 					http://www.infoq.com/presentations/click-crash-course-modern-hardware
 					https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
 					prefetching
-					hierarchiczny cache - IMPORTANT
+					guzo: hierarchiczny cache - IMPORTANT
 						budowa
 							hierarchia
 							cache sa raczej per-core, na ogol LLC (lowest layer of cache) wspoldzielony, wraz zwarstwa zapewniajaca cache coherence
@@ -160,7 +160,7 @@ co mozna wykorzystac
 							no-lockup cache
 							miss shadow
 					hierarchiczny TLB
-					rownoleglosc w sprzecie - IMPORTANT
+					guzo: rownoleglosc w sprzecie - IMPORTANT
 						bit-level: operacje na slowach, nie bitach
 						instruction-level: dynamic (wspolczesine x86_64)/static (itanium, inne vliw)
 							pipelining i wszystko zwiazane z nim
@@ -197,7 +197,7 @@ co mozna wykorzystac
 								autovectorization - Intel MIC
 							arm
 								neon
-				x86_64 - IMPORTANT
+				wysek: x86_64 - IMPORTANT
 					nowe instrukcje, nowe rejestry (tak SIMD jak i general purpose, ktorych 2x wiecej)
 						malo rejestrow w x86: fs/gs nieuzywane przez linucha, uzywa go pthreads
 							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
@@ -207,7 +207,7 @@ co mozna wykorzystac
 							porownac -mfpmath={387,sse}
 							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
 	jezyk
-		C i C++ - IMPORTANT
+		both: C i C++ - IMPORTANT
 			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
 				underhanded c contest: not likely to impress the judges w/ >300SLOC: "You can hide a semi truck in 300 lines of C"
 			undefined behavior - http://xkcd.com/292/
@@ -294,7 +294,7 @@ co mozna wykorzystac
 		profiling/code coverage: gprof,cachegrind/gcov - megawazne, bedzie jeszcze mowa przy kompilatorze
 		debugger/disasembler (albo po prostu zmuszanie kompilatora do wyplucia asm): gdb
 		packer: upx
-		kompilator ("compiler" - Latin "to pillage"): gcc - IMPORTANT
+		wysek: kompilator ("compiler" - Latin "to pillage"): gcc - IMPORTANT
 			Jak dziala: FE->IR->Optim->BE
 			flagi
 				oczywiste
@@ -325,7 +325,7 @@ co mozna wykorzystac
 					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Debugging-Options.html
 				demo: mandel + diffy z -ffastmath, -mfpmath=? i out z vector, byc moze profiler
 				demo: cachegrind na himrbp
-			wspolpraca z kompilatorem - IMPORTANT
+			wysek: wspolpraca z kompilatorem - IMPORTANT
 				intristics/builtins
 					__builtin_expect (G_UNLIKELY)
 						-fprofile-arcs
@@ -384,7 +384,7 @@ porownanie, demo typowych optymalizacji
 						demo: heapsort coraz wolniejszy od quicksorta bo posrednie adresowanie - John Bentley "Three Beautiful Quicksorts"
 						custom heap w QS: lepiej zmien kompilator jak robi to gorzej niz Ty
 						fajne-na-papierze-niepraktyczne-w-realu mnozenia macierzy: http://en.wikipedia.org/wiki/File:Bound_on_matrix_multiplication_omega_over_time.svg
-				memory access patterns - IMPORTANT
+				guzo: memory access patterns - IMPORTANT
 					cache-aware
 						liniowo (nie tylko tablice - struktury tez)
 						reuse (rejestry)
@@ -396,7 +396,7 @@ porownanie, demo typowych optymalizacji
 					futures/promises
 					async
 			"na poziomie kodu zrodlowego" - nie przesadzac - na ogol kompilator to zrobi
-				inlining  - IMPORTANT
+				wysek: inlining  - IMPORTANT
 					inlining jako "enabling transformation" dla zwijania/zabaw z rejestrami
 					kiedy
 						male funkcje (gettery w C++)
@@ -411,13 +411,13 @@ porownanie, demo typowych optymalizacji
 									loop unrolling
 								macross
 									BOOST_PP
-				loop unrolling - IMPORTANT
+				wysek: loop unrolling - IMPORTANT
 					Duff's device
 						demo
 					intel's (other vendors'?) #pargmas
 					macros (BOOST_PP)
 					templates
-				tail recursion elimination - IMPORTANT
+				wysek: tail recursion elimination - IMPORTANT
 				factoring out of invariants
 				dead code elimination - czasem boli
 					dead store elimination
@@ -429,7 +429,7 @@ porownanie, demo typowych optymalizacji
 					available expression analysis
 					live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
 					global value numbering
-				peephole/window optimization (kategoria) - IMPORTANT
+				guzo: peephole/window optimization (kategoria) - IMPORTANT
 					strength reduction
 						uzycie wiekszych typow (procesor natywnie operuje na slowach => za male typy to casty w 2 strony)
 							<stdint.h>: [u]int_fast*_t - na x86_64 wszystkie defaultuja do long
@@ -465,14 +465,14 @@ porownanie, demo typowych optymalizacji
 				VM: jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
 				kompilator: delikatniej: Profile guided optimization (o tym bedzie)
 				CPU: OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
-		osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf - IMPORTANT
+		wysek: osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf - IMPORTANT
 			charakterystyka
 				to one przewaznie jedza duzo czasu i danych (szczegolnie w obliczeniach naukowych), wiec osobny dzial
 				silnie powiazane z architektura pamieci - przewaznie petle sluza do dostepu do niej
 				row/column major (C-like/FORTRAN,MATLAB)
 				aos/soa
 			metody
-				duze - warto pomagac - IMPORTANT
+				guzo: duze - warto pomagac - IMPORTANT
 					cache usage
 						tiling/loop nest optimization - demo: matmul
 						stripmining => automatic parallelisation/vectorisation - demo: matmul
