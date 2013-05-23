@@ -107,6 +107,105 @@ o czym mowa
 			jit/realtime stuff
 			superoptimization
 co mozna wykorzystac
+	architektura
+		ogolnie
+			Zasada Moore'a - mamy do dyspozycji coraz wiecej tranzystorow
+				ale
+					"frequency wall" - koniec skalowania pionowego
+						MHz myth
+							deep pipelines
+								problem z branchami
+									delay slots
+					"memory wall"
+						kiedys bylo prosciej: tanie loady, drogie liczenie. Teraz jest odwrotnie.
+						powody: artykul "latency lags bandwidth"
+						przyklad z uint64toAscii
+							https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
+					predkosc swiatla
+						c ~ 3e8m/s => c ~ .1m/clk (@3GHz)
+							to wszystko w prozni, i zawyzone i nie wzielismy pod uwage tranzystorow => w praktyce wiele mniej
+				te czynniki sprawiaja, ze coraz wiecej logiki na procesorze idzie w rozne sprytne techniki optymalizacji
+				nie mozemy robic rzeczy szybciej, wiec staramy sie robic wiecej jednoczesnie
+					podejscie multicore vs. manycore, risc vs. cisc, x86: multicore cisc - skomplikowane rdzenie
+						cisc: pod latwosc pisania recznie
+					http://www.infoq.com/presentations/click-crash-course-modern-hardware
+					https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
+					prefetching
+					hierarchiczny cache - IMPORTANT
+						budowa
+							hierarchia
+							cache sa raczej per-core, na ogol LLC (lowest layer of cache) wspoldzielony, wraz zwarstwa zapewniajaca cache coherence
+								btw: modele pamieci (od strony jezyka), memory fences
+							cache lines, associativity
+						predkosci
+							register ~ 1clk
+							L1  ~      3clk
+							L2  ~     15clk
+							L3  ~ 50-100clk
+							mem ~    200clk
+						dlaczego szybciej?
+							blisko (bylo o predkosci swiatla)
+							sram vs. dram
+								refreshes, complicated logics (many truth levels) "decay"?
+						efekty
+							demo: wykres z "three beautiful quicksorts"
+							demo: "gallery of processor cache effects"
+							"cache performance and optimizations of blocked algorithms"
+							"cache oblivious algorithms"
+							lokalnosc danych wazna: page coloring
+							demo: matmul, blocked matmul, cache oblivious matmul
+						w sprzecie
+							cache miss => pipeline stall
+							hit-under-miss cache
+							no-lockup cache
+							miss shadow
+					hierarchiczny TLB
+					rownoleglosc w sprzecie - IMPORTANT
+						bit-level: operacje na slowach, nie bitach
+						instruction-level: dynamic (wspolczesine x86_64)/static (itanium, inne vliw)
+							pipelining i wszystko zwiazane z nim
+								problemy
+									himrbp
+									jump i spill rejestrow
+									pipe flush
+								branch prediction
+									demo: himrbp
+									implementacja
+										maszyna stanow (diagram)
+										https://en.wikipedia.org/wiki/Branch_prediction_analysis_attacks#Side-channel_analysis_attacks
+								rozw
+									delay slots
+									instrukcje ktore robia compare i cos
+									inlining
+									unrolling
+							+nadmiar rejestrow (> niz w "api", np. 27)
+								register renaming
+									ooo
+								pipelining => :( => bp => speculative exec
+									register renaming
+									troche jak pamiec transakcyjna
+									"do it all, choose the result"
+									store buffer, L0 cache
+							superscalar execution
+						data-level prallelism: SIMD
+							x86{,_64}
+								MMX - 64b
+								SSE - 128b
+								AVX - 256b
+								MIC's VPU - 512b
+								http://locklessinc.com/articles/vectorize/
+								autovectorization - Intel MIC
+							arm
+								neon
+				x86_64 - IMPORTANT
+					nowe instrukcje, nowe rejestry (tak SIMD jak i general purpose, ktorych 2x wiecej)
+						malo rejestrow w x86: fs/gs nieuzywane przez linucha, uzywa go pthreads
+							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
+							For instance, Microsoft Windows on x86-64 uses the GS segment to point to the Thread Environment Block, a small data structure for each thread, which contains information about exception handling, thread-local variables, and other per-thread state. Similarly, the Linux kernel uses the GS segment to store per-CPU data.
+						lea
+						podobno nikt nie optymalizuje sprzetu pod stare instrukcje z x86, szczegolnie x87 (ponoc 5x wolniej)
+							porownac -mfpmath={387,sse}
+							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
 	jezyk
 		C i C++ - IMPORTANT
 			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
@@ -256,7 +355,7 @@ co mozna wykorzystac
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Function-Attributes.html
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Type-Attributes.html
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Variable-Attributes.html
-							vector: przyklad vec/sse.cpp
+							demo: vec/sse.cpp
 						mnostwo rzeczy:
 							pure - troche jak w programowaniu funkcjonalnym, choc zrelaksowana definicja
 							noinline,alwaysinline - inline'owanie
@@ -270,105 +369,6 @@ co mozna wykorzystac
 					standardowa skladnia, {nie,}standardowe atrybuty: c++11 [http://en.cppreference.com/w/cpp/language/attributes]
 						noreturn - funkcja nigdy nic nie zwraca (np. void foo(){throw 5;})
 						carries_dependency -
-	architektura
-		ogolnie
-			Zasada Moore'a - mamy do dyspozycji coraz wiecej tranzystorow
-				ale
-					"frequency wall" - koniec skalowania pionowego
-						MHz myth
-							deep pipelines
-								problem z branchami
-									delay slots
-					"memory wall"
-						kiedys bylo prosciej: tanie loady, drogie liczenie. Teraz jest odwrotnie.
-						powody: artykul "latency lags bandwidth"
-						przyklad z uint64toAscii
-							https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
-					predkosc swiatla
-						c ~ 3e8m/s => c ~ .1m/clk (@3GHz)
-							to wszystko w prozni, i zawyzone i nie wzielismy pod uwage tranzystorow => w praktyce wiele mniej
-				te czynniki sprawiaja, ze coraz wiecej logiki na procesorze idzie w rozne sprytne techniki optymalizacji
-				nie mozemy robic rzeczy szybciej, wiec staramy sie robic wiecej jednoczesnie
-					podejscie multicore vs. manycore, risc vs. cisc, x86: multicore cisc - skomplikowane rdzenie
-					http://www.infoq.com/presentations/click-crash-course-modern-hardware
-					https://www.facebook.com/notes/facebook-engineering/three-optimization-tips-for-c/10151361643253920
-					prefetching
-					hierarchiczny cache - IMPORTANT
-						budowa
-							hierarchia
-							cache sa raczej per-core, na ogol LLC (lowest layer of cache) wspoldzielony, wraz zwarstwa zapewniajaca cache coherence
-								btw: modele pamieci (od strony jezyka), memory fences
-							cache lines, associativity
-						predkosci
-							register ~ 1clk
-							L1  ~      3clk
-							L2  ~     15clk
-							L3  ~ 50-100clk
-							mem ~    200clk
-						dlaczego szybciej?
-							blisko (bylo o predkosci swiatla)
-							sram vs. dram
-								refreshes, complicated logics (many truth levels) "decay"?
-						efekty
-							demo: wykres z "three beautiful quicksorts"
-							demo: "gallery of processor cache effects"
-							demo: matmul, blocked matmul, cache oblivious matmul
-							"cache performance and optimizations of blocked algorithms"
-								matmul jako przyklad
-							"cache oblivious algorithms"
-							lokalnosc danych wazna: page coloring
-						w sprzecie
-							cache miss => pipeline stall
-							hit-under-miss cache
-							no-lockup cache
-							miss shadow
-					hierarchiczny TLB
-					rownoleglosc w sprzecie - IMPORTANT
-						bit-level: operacje na slowach, nie bitach
-						instruction-level: dynamic (wspolczesine x86_64)/static (itanium, inne vliw)
-							pipelining i wszystko zwiazane z nim
-								problemy
-									himrbp
-									jump i spill rejestrow
-									pipe flush
-								branch prediction
-									demo: himrbp
-									implementacja
-										maszyna stanow (diagram)
-										https://en.wikipedia.org/wiki/Branch_prediction_analysis_attacks#Side-channel_analysis_attacks
-								rozw
-									delay slots
-									instrukcje ktore robia compare i cos
-									inlining
-									unrolling
-							+nadmiar rejestrow (> niz w "api", np. 27)
-								register renaming
-									ooo
-								pipelining => :( => bp => speculative exec
-									register renaming
-									troche jak pamiec transakcyjna
-									"do it all, choose the result"
-									store buffer, L0 cache
-							superscalar execution
-						data-level prallelism: SIMD
-							x86{,_64}
-								MMX - 64b
-								SSE - 128b
-								AVX - 256b
-								MIC's VPU - 512b
-								http://locklessinc.com/articles/vectorize/
-								autovectorization - Intel MIC
-							arm
-								neon
-				x86_64 - IMPORTANT
-					nowe instrukcje, nowe rejestry (tak SIMD jak i general purpose, ktorych 2x wiecej)
-						malo rejestrow w x86: fs/gs nieuzywane przez linucha, uzywa go pthreads
-							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
-							For instance, Microsoft Windows on x86-64 uses the GS segment to point to the Thread Environment Block, a small data structure for each thread, which contains information about exception handling, thread-local variables, and other per-thread state. Similarly, the Linux kernel uses the GS segment to store per-CPU data.
-						lea
-						podobno nikt nie optymalizuje sprzetu pod stare instrukcje z x86, szczegolnie x87 (ponoc 5x wolniej)
-							porownac -mfpmath={387,sse}
-							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
 porownanie, demo typowych optymalizacji
 	podzial
 		logicznie (dosc luzno, niekompletnie)
@@ -379,9 +379,9 @@ porownanie, demo typowych optymalizacji
 					za zapisem w asm: Ty wiesz co chcesz
 					stale ukryte w notacji O()
 						buffered vs. unbuffered
-							FIXME: przyklad
+							demo
 						kiedy n*n serio zacznie byc wolniejszy od nlogn - przyklad z QS ktory ma fallback do n*n na malych podprzedzialach
-						heapsort coraz wolniejszy od quicksorta bo posrednie adresowanie - John Bentley "Three Beautiful Quicksorts"
+						demo: heapsort coraz wolniejszy od quicksorta bo posrednie adresowanie - John Bentley "Three Beautiful Quicksorts"
 						custom heap w QS: lepiej zmien kompilator jak robi to gorzej niz Ty
 						fajne-na-papierze-niepraktyczne-w-realu mnozenia macierzy: http://en.wikipedia.org/wiki/File:Bound_on_matrix_multiplication_omega_over_time.svg
 				memory access patterns - IMPORTANT
@@ -413,7 +413,7 @@ porownanie, demo typowych optymalizacji
 									BOOST_PP
 				loop unrolling - IMPORTANT
 					Duff's device
-						FIXME: przyklad
+						demo
 					intel's (other vendors'?) #pargmas
 					macros (BOOST_PP)
 					templates
@@ -450,10 +450,10 @@ porownanie, demo typowych optymalizacji
 					xor reg, reg vs. mov reg, 0
 					"Division by Invariant Integers using Multiplication"
 					http://www.nynaeve.net/?p=64
-					przyklad: src/common/common_optimizations.c
 					prostsza matematyka
 						-fast-math, flush to 0, denorm, takietam
 						bitshifty zamiast mnozen
+					demo: src/common/common_optimizations.c
 				calling conventions
 				vectorization
 				dopasowanie pod arch: -mtune=*
