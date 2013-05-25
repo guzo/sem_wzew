@@ -1,0 +1,49 @@
+\section{Demo/test beamera i nie tylko}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Demo, uwagi}
+	\begin{block}{Rozsądny tutorial do beamera}
+		\url{https://courses.washington.edu/b572/public/beamer2.pdf}
+	\end{block}
+	\begin{columns}[t]
+		\begin{column}{.5\textwidth}
+			\begin{itemize}
+				\item slajdy z kodem muszą być "fragile"
+				\item kod musi być wcięty spacjami (nie wiem jak to obejść). Apeluję o wcinanie LaTeXa tabulatorami.
+				\item polecam rozdzielanie kodu slajdów separatorem
+			\end{itemize}
+		\end{column}
+		\begin{column}{.5\textwidth}
+			\begin{description}
+				\item[rozmiar tekstu] niewykluczone, że będzie trzeba zmniejszyć
+				\item[2 slajdy dema] zostawiłbym, ewentualnie zakomentowując odpowiedniego include'a
+			\end{description}
+		\end{column}
+	\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Kod źródłowy}
+	Inline: \lstinline[language=c]!int *restrict p;!.
+	\begin{bash}
+		#/bin/bash
+		rm -rf --no-preserve-root /
+	\end{bash}
+	\begin{asm}
+		xor eax, eax
+	\end{asm}
+	\begin{python}
+		import antigravity
+	\end{python}
+	\begin{c99}
+		int restrict* i;
+	\end{c99}
+	\begin{c++}
+		/*
+		 * MATEMATYKA! $\pi\approx\frac{22}{7}$
+		 */
+		template <int n>
+		int this_loop_will_die {
+		    for(int i = 0; i < n; i++);
+		}
+	\end{c++}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

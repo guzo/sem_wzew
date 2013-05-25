@@ -1,0 +1,38 @@
+\documentclass[10pt]{beamer}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+
+\title{Optymalizacja}
+\subtitle{współpraca pomiędzy programistą, kompilatorem i sprzętem}
+\author{Michał Wysokiński i Michał Wielgus}
+\institute{IS (SWiR), WFiIS AGH}
+\date[2013]{Seminarium z WZEW - 2013}
+
+\usepackage{listings}
+\lstset{
+	numbers=left, stepnumber=1,
+	tabsize=4, obeytabs=true,
+	showstringspaces=true,
+	breaklines=true, breakatwhitespace=true,
+	captionpos=b, mathescape=true,
+	basicstyle=\small, frame=single,
+}
+\lstnewenvironment{c99}   {\lstset{language=C     }}{}
+\lstnewenvironment{c++}   {\lstset{language=C++   }}{}
+\lstnewenvironment{bash}  {\lstset{language=bash  }}{}
+\lstnewenvironment{python}{\lstset{language=python}}{}
+\lstnewenvironment{asm}   {\lstset{language=[x86masm]Assembler}}{}
+
+\usetheme{Warsaw}
+\begin{document}
+\setbeamercovered{dynamic}
+
+\frame{\maketitle}
+\frame{\tableofcontents}
+
+\input{demo}  %FIXME: don't include in the final version
+\input{part0}
+\input{part1}
+\input{part2}
+\end{document}

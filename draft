@@ -206,6 +206,8 @@ co mozna wykorzystac
 						podobno nikt nie optymalizuje sprzetu pod stare instrukcje z x86, szczegolnie x87 (ponoc 5x wolniej)
 							porownac -mfpmath={387,sse}
 							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
+						zapobiegawcze podejcie kompilatorow (sse, nie tylko)
+							przekompilowanie strength_reduction.c z -m32
 	jezyk
 		both: C i C++ - IMPORTANT
 			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
@@ -369,134 +371,132 @@ co mozna wykorzystac
 					standardowa skladnia, {nie,}standardowe atrybuty: c++11 [http://en.cppreference.com/w/cpp/language/attributes]
 						noreturn - funkcja nigdy nic nie zwraca (np. void foo(){throw 5;})
 						carries_dependency -
-porownanie, demo typowych optymalizacji
-	podzial
-		logicznie (dosc luzno, niekompletnie)
-			"etap projektowania"
-				wybor algorytmu/architektury
-					przyklady - byly: jeszcze raz wrzucic na slajd
-					za zapisem w jezyku wysokiego poziomu: kompilator jest sprytny
-					za zapisem w asm: Ty wiesz co chcesz
-					stale ukryte w notacji O()
-						buffered vs. unbuffered
-							demo
-						kiedy n*n serio zacznie byc wolniejszy od nlogn - przyklad z QS ktory ma fallback do n*n na malych podprzedzialach
-						demo: heapsort coraz wolniejszy od quicksorta bo posrednie adresowanie - John Bentley "Three Beautiful Quicksorts"
-						custom heap w QS: lepiej zmien kompilator jak robi to gorzej niz Ty
-						fajne-na-papierze-niepraktyczne-w-realu mnozenia macierzy: http://en.wikipedia.org/wiki/File:Bound_on_matrix_multiplication_omega_over_time.svg
-				guzo: memory access patterns - IMPORTANT
-					cache-aware
-						liniowo (nie tylko tablice - struktury tez)
-						reuse (rejestry)
-					prefetch (tez jawny)
-						hierarchy
-							cache
-							tlb
-				lazy evaluation
-					futures/promises
-					async
-			"na poziomie kodu zrodlowego" - nie przesadzac - na ogol kompilator to zrobi
-				wysek: inlining  - IMPORTANT
-					inlining jako "enabling transformation" dla zwijania/zabaw z rejestrami
-					kiedy
-						male funkcje (gettery w C++)
-							wiecej kodu na wywolanie i sprzatanie niz na funkcje
-						funkcje uzyte tylko raz (dla przejrzystosci) (static)
-					inline expansion
-						constexpr folding
-							const - nie do konca
-							constexpr (C++11)
-							metaprogramming
-								c++ templates
-									loop unrolling
-								macross
-									BOOST_PP
-				wysek: loop unrolling - IMPORTANT
-					Duff's device
-						demo
-					intel's (other vendors'?) #pargmas
-					macros (BOOST_PP)
-					templates
-				wysek: tail recursion elimination - IMPORTANT
+porownanie, demo typowych optymalizacji - luzny, niezobowiazujacy podzial
+	"etap projektowania"
+		wybor algorytmu/architektury
+			przyklady - byly: jeszcze raz wrzucic na slajd
+			za zapisem w jezyku wysokiego poziomu: kompilator jest sprytny
+			za zapisem w asm: Ty wiesz co chcesz
+			stale ukryte w notacji O()
+				buffered vs. unbuffered
+					demo
+				kiedy n*n serio zacznie byc wolniejszy od nlogn - przyklad z QS ktory ma fallback do n*n na malych podprzedzialach
+				demo: heapsort coraz wolniejszy od quicksorta bo posrednie adresowanie - John Bentley "Three Beautiful Quicksorts"
+				custom heap w QS: lepiej zmien kompilator jak robi to gorzej niz Ty
+				fajne-na-papierze-niepraktyczne-w-realu mnozenia macierzy: http://en.wikipedia.org/wiki/File:Bound_on_matrix_multiplication_omega_over_time.svg
+		guzo: memory access patterns - IMPORTANT
+			cache-aware
+				liniowo (nie tylko tablice - struktury tez)
+				reuse (rejestry)
+			prefetch (tez jawny)
+				hierarchy
+					cache
+					tlb
+		lazy evaluation
+			futures/promises
+			async
+	"na poziomie kodu zrodlowego" - nie przesadzac - na ogol kompilator to zrobi
+		wysek: inlining  - IMPORTANT
+			inlining jako "enabling transformation" dla zwijania/zabaw z rejestrami
+			kiedy
+				male funkcje (gettery w C++)
+					wiecej kodu na wywolanie i sprzatanie niz na funkcje
+				funkcje uzyte tylko raz (dla przejrzystosci) (static)
+			inline expansion
+				constexpr folding
+					const - nie do konca
+					constexpr (C++11)
+					metaprogramming
+						c++ templates
+							loop unrolling
+						macross
+							BOOST_PP
+		wysek: loop unrolling - IMPORTANT
+			Duff's device
+				demo
+			intel's (other vendors'?) #pargmas
+			macros (BOOST_PP)
+			templates
+		wysek: tail recursion elimination - IMPORTANT
+		factoring out of invariants
+		dead code elimination - czasem boli
+			dead store elimination
+		jump threading "merge instrukcji warunkowych"
+		test reordering
+		prefetching (choc efekt na poziomie asm)
+	na poziomie IR
+		dead code elimination - powtorka. "Pokrewne":
+			available expression analysis
+			live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
+			global value numbering
+		guzo: peephole/window optimization (kategoria) - IMPORTANT
+			strength reduction
+				uzycie wiekszych typow (procesor natywnie operuje na slowach => za male typy to casty w 2 strony)
+					<stdint.h>: [u]int_fast*_t - na x86_64 wszystkie defaultuja do long
+					definicja int ze standardu: "alias" dla long/short, zalezy co szybsze
+						"the int type in C is intended to be the best choice when one does not care about the range of a variable"
+					z drugiej strony: male typy i SIMD
+			constant folding/propagation
+		common subexpression elimination
+			partial redundancy elimination
+		manifest expression
+			licznik petli w omp parallel for
+	na poziomie asm (przy przejsciu z IR)
+		register allocation
+		instruction selection - jedna z metod strength reduction - IMPORTANT
+			lea zamiast prostych mnozen (bez side effcts, ustalone argumenty)
+				"Like any good optimization, it makes the implementation a bit messier, but doesn't affect the interface."
+			shifty zamiast mnozen/dzielen przez 2**n
+			xor reg, reg vs. mov reg, 0
+			"Division by Invariant Integers using Multiplication"
+			http://www.nynaeve.net/?p=64
+			prostsza matematyka
+				-fast-math, flush to 0, denorm, takietam
+				bitshifty zamiast mnozen
+			demo: src/common/common_optimizations.c
+		calling conventions
+		vectorization
+		dopasowanie pod arch: -mtune=*
+		trace scheduling
+		stack reuse
+		register reuse
+		frame pointer omission
+	wykonanie
+		VM: jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
+		kompilator: delikatniej: Profile guided optimization (o tym bedzie)
+		CPU: OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
+	wysek: osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf - IMPORTANT
+		charakterystyka
+			to one przewaznie jedza duzo czasu i danych (szczegolnie w obliczeniach naukowych), wiec osobny dzial
+			silnie powiazane z architektura pamieci - przewaznie petle sluza do dostepu do niej
+			row/column major (C-like/FORTRAN,MATLAB)
+			aos/soa
+		metody
+			guzo: duze - warto pomagac - IMPORTANT
+				cache usage
+					tiling/loop nest optimization - demo: matmul
+					stripmining => automatic parallelisation/vectorisation - demo: matmul
+						problemy
+							dependencies
+							aliasing
+						OpenMP
+					loop unrolling - demo: matmul
+					loop interchange - demo: matmul
+						row/column major
+					loop fusion/fission
+			drobne - prawdopodobnie sliding window
 				factoring out of invariants
-				dead code elimination - czasem boli
-					dead store elimination
-				jump threading "merge instrukcji warunkowych"
-				test reordering
-				prefetching (choc efekt na poziomie asm)
-			na poziomie IR
-				dead code elimination - powtorka. "Pokrewne":
-					available expression analysis
-					live variable analysis - kiedy mozna ubic zmienna - tj. nie trzymac jej juz dalej
-					global value numbering
-				guzo: peephole/window optimization (kategoria) - IMPORTANT
-					strength reduction
-						uzycie wiekszych typow (procesor natywnie operuje na slowach => za male typy to casty w 2 strony)
-							<stdint.h>: [u]int_fast*_t - na x86_64 wszystkie defaultuja do long
-							definicja int ze standardu: "alias" dla long/short, zalezy co szybsze
-								"the int type in C is intended to be the best choice when one does not care about the range of a variable"
-							z drugiej strony: male typy i SIMD
-					constant folding/propagation
-				common subexpression elimination
-					partial redundancy elimination
-				manifest expression
-					licznik petli w omp parallel for
-			na poziomie asm (przy przejsciu z IR)
-				register allocation
-				instruction selection - jedna z metod strength reduction - IMPORTANT
-					lea zamiast prostych mnozen (bez side effcts, ustalone argumenty)
-						"Like any good optimization, it makes the implementation a bit messier, but doesn't affect the interface."
-					shifty zamiast mnozen/dzielen przez 2**n
-					xor reg, reg vs. mov reg, 0
-					"Division by Invariant Integers using Multiplication"
-					http://www.nynaeve.net/?p=64
-					prostsza matematyka
-						-fast-math, flush to 0, denorm, takietam
-						bitshifty zamiast mnozen
-					demo: src/common/common_optimizations.c
-				calling conventions
-				vectorization
-				dopasowanie pod arch: -mtune=*
-				trace scheduling
-				stack reuse
-				register reuse
-				frame pointer omission
-			wykonanie
-				VM: jit/self-modifying code/dynamic recompilation/adaptive optimization - (python (?))
-				kompilator: delikatniej: Profile guided optimization (o tym bedzie)
-				CPU: OOOE, pipelining, instruction scheduling, register renaming (o tym tez)
-		wysek: osobno petle - http://parlab.eecs.berkeley.edu/wiki/_media/patterns/loop_parallelism.pdf - IMPORTANT
-			charakterystyka
-				to one przewaznie jedza duzo czasu i danych (szczegolnie w obliczeniach naukowych), wiec osobny dzial
-				silnie powiazane z architektura pamieci - przewaznie petle sluza do dostepu do niej
-				row/column major (C-like/FORTRAN,MATLAB)
-				aos/soa
-			metody
-				guzo: duze - warto pomagac - IMPORTANT
-					cache usage
-						tiling/loop nest optimization - demo: matmul
-						stripmining => automatic parallelisation/vectorisation - demo: matmul
-							problemy
-								dependencies
-								aliasing
-							OpenMP
-						loop unrolling - demo: matmul
-						loop interchange - demo: matmul
-							row/column major
-						loop fusion/fission
-				drobne - prawdopodobnie sliding window
-					factoring out of invariants
-					loop-invariant code motion
-						int s = 0; for(int i; i < n; i++) s+=5; => int s = n*5
-					induction variable elimination
-						ogolniejszy przypadek powyzszego
-					rematerialization - obliczanie na nowo, bo dostep do pamieci jest drogi
-						troche jak xor reg, reg vs. mov reg, 0
-					bounds checking elimination
-					obsluga szczegolnych przypadkow
-						splitting - po roznych zakresach, np. osobna konwolucja w srodku/na brzegach
-						peeling - pojedyncze przypadki: rogi, brzegi w 1D
-						unswitching - osobne petle dla roznych przypadkow
+				loop-invariant code motion
+					int s = 0; for(int i; i < n; i++) s+=5; => int s = n*5
+				induction variable elimination
+					ogolniejszy przypadek powyzszego
+				rematerialization - obliczanie na nowo, bo dostep do pamieci jest drogi
+					troche jak xor reg, reg vs. mov reg, 0
+				bounds checking elimination
+				obsluga szczegolnych przypadkow
+					splitting - po roznych zakresach, np. osobna konwolucja w srodku/na brzegach
+					peeling - pojedyncze przypadki: rogi, brzegi w 1D
+					unswitching - osobne petle dla roznych przypadkow
 podsumowanie
 	zlozony temat
 	koniecznosc profilowania
