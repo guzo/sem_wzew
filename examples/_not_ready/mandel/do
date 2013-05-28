@@ -1,0 +1,17 @@
+#!/bin/bash
+for flag in "" -ffast-math -mfpmath={387,sse}; do
+	for o in {0..3} g; do
+		gcc -std=c99 $flag -O$o -oflags${flag}_O${o}.out                     mandel.c
+		gcc -std=c99 $flag -O$o -oflags${flag}_O${o}_FAST.out -DFAST         mandel.c
+		gcc -std=c99 $flag -O$o -oflags${flag}_O${o}_si.out   -DSMALLFUNC='static inline' mandel.c
+		gcc -std=c99 $flag -O$o -oflags${flag}_O${o}_i.out    -DSMALLFUNC='inline'        mandel.c
+		gcc -std=c99 $flag -O$o -oflags${flag}_O${o}.s        -S -masm=intel mandel.c
+	done
+done
+
+for f in flags*.out; do
+	echo $f
+	time ./$f $f.ppm 1024 > /dev/null
+done
+
+md5sum *.ppm

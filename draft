@@ -1,4 +1,6 @@
 #FIXME: zrodla
+#FIXME: declarative: give up scheduling
+#FIXME: turn of ASLR: echo 0 > /proc/sys/kernel/randomize_va_space
 
 o czym mowa
 	zalozenia
@@ -50,6 +52,7 @@ o czym mowa
 					-Og
 					#!/usr/local/bin/tcc -run
 					C++: precompiled headers
+						demo na przewalonym fibonaccim?
 			inne
 				jakosc obliczen
 					dokladnosc, powtarzalnosc
@@ -65,6 +68,7 @@ o czym mowa
 				bezpieczenstwo:
 					proof of work/salting/bcrypt i pokrewne jako "odwrotna optymalizacja na poziomie algorytmu"
 					przeciwdzialanie "timing attacks"
+				latwosc utrzymania
 				tylko ascii printable chars: http://en.wikipedia.org/wiki/EICAR_test_file
 			nielatwo ustalic ktory zestaw technik da najlepszy wynik, bo optymalizacja to wysoce nieliniowy proces
 				tradeoffs
@@ -208,6 +212,7 @@ co mozna wykorzystac
 							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
 						zapobiegawcze podejcie kompilatorow (sse, nie tylko)
 							przekompilowanie strength_reduction.c z -m32
+						gcc -mx32: http://en.wikipedia.org/wiki/X32_ABI
 	jezyk
 		both: C i C++ - IMPORTANT
 			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
