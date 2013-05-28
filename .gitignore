@@ -1,6 +1,6 @@
 todo
 lit
-tex/out
+tex/out/*
 *.s
 *.out
 *swp

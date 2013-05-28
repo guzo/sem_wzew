@@ -1,16 +1,142 @@
 \section{Wstęp} %FIXME: mniej głupia nazwa
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Założenia}
+\begin{frame}[fragile]{Założenia}
 	\begin{block}{Skrótowo}
 		\begin{itemize}
 			\item Single-thread performance
-			\item \texttt{x86} i \texttt{x86\_64}
-			\item Szeroki temat, ale zostawimy informacje co doczytać
+			\item \verb*%x86{,-64}%
+			\item \verb%C{89,99}%, \verb%C++{03,11}%, assembler \verb%x86_64%
+			\begin{itemize}
+				\item raczej standard, ale też kilka rozszerzeń GNU
+			\end{itemize}
+			\item nie wszystko zdążymy, ale powiemy gdzie doczytać
 		\end{itemize}
 	\end{block}
 	\begin{block}{Przykłady}
 		\begin{itemize}
-			\item Nie wszędzie z pomiarem czasu
+			\item Nie wszędzie z pomiarem czasu - niektóre optymalizacje zbyt drobne
+			\item Kilka większych - staramy się aby były praktyczne
+			\item Udostępnimy kod
+			\item kilka zagadnień się powtórzy, bo zaatakujemy je z różnych stron
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Optymalizacja}
+	\begin{block}{Nazwa}
+		\begin{itemize}
+			\item trudno nawet marzyć o optimum
+			\item stosowane techniki czasem się wzajemnie ,,znoszą'' - bardzo nieliniowy proces
+			\item stąd superoptymalizacja: małe podproblemy, przeszukiwanie całej przestrzani rozwiązań i przerażające bithacki
+		\end{itemize}
+		\begin{quote}
+			Given an instruction set, the superoptimizer finds the shortest program to compute a function.
+			Startling programs have been generated, many of them engaging in \textbf{convoluted bit-fiddling} bearing little resemblance to the source programs which defined the functions.
+			The key idea in the superoptimizer is a probabilistic test that makes \textbf{exhaustive searches} practical for programs of useful size.
+		\end{quote}
+		Henry Massalin: ,,Superoptimizer -- A Look at the Smallest Program''
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{,,Poprawa programu zgodnie z jakimś kryterium...''}
+	\begin{block}{Typowo}
+		\begin{itemize}
+			\item Szybsze wykonanie
+			\begin{itemize}
+				\item Na jakim sprzęcie?
+				\item Na jakim rozmiarze danych? (QS vs. IS)
+				\item Co znaczy szybsze? (Performance? Throughput? Availability?)
+				\item Co nas spowalnia? (Pamięć? Obliczenia? IO?)
+				\item ,,There is no benchmark but your benchmark'' -- Alex Gaynor
+			\end{itemize}
+			\item Mniejszy rozmiar pliku wykonywalnego ($\mu$C, embedded, shellcode) - czasem przyspiesza wykonanie przez lepsze wykorzystanie I\$ (\url{http://lwn.net/Articles/534735/}): \verb*%-Os%, \verb*%upx%
+			\item Łatwiejszy debug (vs. inlining/reordering/usuwanie kodu): \verb*%-O0%, \verb*%-Og%
+			\item Szybka kompilacja: \verb*%tcc%, \verb*%-Og%, precompiled headers
+		\end{itemize}
+	\end{block}
+	\begin{block}{Rzadziej}
+		\begin{itemize}
+			\item Jakość obliczeń
+			\begin{itemize}
+				\item \verb*%-ffast-math%, subnormale
+				\item MAD/FMA, powtarzalność
+				\item alternatywy dla reprezentacji zmiennoprzecinkowej (interval, fixed point)
+			\end{itemize}
+			\item Zużycie energii (np. taniej liczyć niż przesyłać dane po chipie) %FIXME: quote CERNCARMA
+			\item Bezpieczeństwo - proof of work/salting/bcrypt i podobne jako ,,odwrotna optymalizacja na poziomie algorytmu''
+			\item Łatwość utrzymania kodu
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{,,... przy utrzymaniu spodziewanego zachowania''}
+	,,Spodziewającym się'' jest Standard języka:
+	\begin{itemize}
+		\item C i pokrewne języki - ,,undefined behavior''
+		\begin{itemize}
+			\item ,,nasal deamons'', \verb*%nethack%
+			\item dostęp poza tablicę (\url{http://blog.regehr.org/archives/918}):
+				\begin{columns}
+					%FIXME: hacky dimensions
+					\begin{column}{.4\textwidth}\begin{c99}
+						int d[16];
+						int SATD (void) {
+						    int satd = 0, dd, k;
+						    for (dd=d[k=0]; k<16; dd=d[++k]) satd += (dd < 0 ? -dd : dd);
+						    return satd;
+						}
+					\end{c99}\end{column}
+					\begin{column}{.2\textwidth}\begin{asm}
+						SATD:
+						.L2:
+						    jmp .L2
+					\end{asm}\end{column}
+				\end{columns}
+			\item \verb*%NULL% (\url{https://isc.sans.edu/diary/6820}):
+				\begin{c99}
+					struct sock *sk = tun->sk;  // initialize sk with tun->sk
+					// ...
+					if (!tun) return POLLERR;  // if tun is NULL return error
+				\end{c99}
+			\item \verb*%memcpy% vs. \verb*%memmove% (\url{http://lwn.net/Articles/414467/})
+		\end{itemize}
+		\item ,,Leaky abstractions'', np. IEEE754 \url{http://stackoverflow.com/questions/9314534/}
+		\item Wyjątki w standardzie: RVO, copy elision, ...
+			\begin{cpp}
+				#include <iostream>
+				struct C { C()         {std::cout << " C()\n";}
+				           C(const C&) {std::cout << " C(const C&)\n";}
+				          ~C()         {std::cout << "~C()\n";}};
+				__attribute__((noinline)) C foo() { C a = C(); return a; }
+				int main() { C a, b = C(), c = C(C(C(C(C(C(C())))))), d = foo();}
+			\end{cpp}
+		\item reorder, inlining, removal: \verb*%-Og%
+			\begin{itemize}
+				\item delay loops
+				\item \verb*%memset% (\url{http://www.viva64.com/en/b/0178/}):
+					\begin{c99}
+						int crypto_pk_private_sign_digest(...) {
+						    char digest[DIGEST_LEN];
+						    // ...
+						    memset(digest, 0, sizeof(digest));
+						    return r;
+						}
+					\end{c99}
+			\end{itemize}
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FIXME: move somewhere (more) appropriate
+\begin{frame}{Pokrewne zagadnienia}
+	\begin{block}{Tyle się zmieściło, bo więcej nie weszło}
+		\begin{itemize}
+			\item Static code analysis
+			\item Object code optimization
+			\item Link-time optimization
+			\item Profile guieded optimization
+			\item Superoptimization
+			% FIXME realtime
+			% FIXME links to linktime
 		\end{itemize}
 	\end{block}
 \end{frame}

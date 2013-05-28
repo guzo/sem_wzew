@@ -87,17 +87,17 @@ o czym mowa
 				leaky abstractions
 					kompilator nie moze usunac "0.0f" z a + 0.0f, bo 0.0f nie jest elementem neutralnym dodawania w IEEE754. Co wiecej: problemy z ieee754
 						http://stackoverflow.com/questions/9314534/why-does-changing-0-1f-to-0-slow-down-performance-by-10x
+				memset
+					memset gets removed: http://www.viva64.com/en/b/0178/
+					why clean memory?: http://www.viva64.com/en/k/0041/
 				undefined behavior - wiecej pozniej
 					nasal deamons
 						comp.std.c “When the compiler encounters [a given undefined construct] it is legal for it to make demons fly out of your nose” [catb]
 						stary gcc uruchamial nethacka [wiki]
-					pointer access
+					memory access
 						out of bounds:
 							 value range propagation: http://www.reddit.com/r/programming/comments/1auk34/john_regehr_gcc_48_breaks_broken_spec_2006/
 						nullptr: https://isc.sans.edu/diary/A+new+fascinating+Linux+kernel+vulnerability/6820
-					memset
-						memset gets removed: http://www.viva64.com/en/b/0178/
-						why clean memory?: http://www.viva64.com/en/k/0041/
 					memcpy vs. memmove
 						http://lwn.net/Articles/414467/
 				debugowanie a identycznosc: -Og
