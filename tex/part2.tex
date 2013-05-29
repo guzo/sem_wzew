@@ -44,11 +44,11 @@
 	\end{block}
 	\begin{block}{Przykład}
 		\begin{cpp}
-		for (x = 0; x < (int)1e8; x++)
-		{
+		for (int x = 0; x < (int)1e8;)
+
 		    do_something(x);
 		}
-		for (x = 0; x < (int)1e8; x++)
+		for (int x = 0; x < (int)1e8;)
 		{
 		    do_something(x);
 		    do_something(++x);
@@ -59,12 +59,12 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Na poziomie języka wysokiego poziomu}
+\subsection{Na etapie uruchomienia kodu}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Python}
+\begin{frame}[fragile]{Python - Pypy's JIT}
 	\begin{itemize}
-		\item Zapytać się, czy jest sens mówić o Pythonie, jeżeli nie ma JIT (CPython).
-		\item Może Java?
+		\item \textbf{JIT} - \textbf{Just in Time} optimisation.
+		\item Domyślny interpreter Pythona (CPython) nie korzysta z JIT.
 	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
