@@ -1,5 +1,68 @@
-%\section{Co można wykorzystać} %FIXME: mniej głupia nazwa
-%\subsection{Sprzęt}
+\section{Dostępne możliwości} %FIXME: mniej głupia nazwa
+\subsection{Sprzęt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{x86\_64}
+	\begin{block}{Nowości}
+		\begin{itemize}
+			\item Nowe rejestry: \textbf{SIMD} i \textbf{general purpose} (2x więcej niż w x86)
+			\item Nowe instrukcje: \textbf{lea} - load effective address (z myślą o operacjach
+			tablicowych, jednak można wykorzystać inaczej - przykład)
+			\item Adresowanie 64-bitowe (większe zmienne + więcej pamięci)
+			\item Rozszerzenia (dla i7): MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AES, PCLMUL;
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Kompilator}
+	\begin{block}{Ogólnie}
+	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
+	\end{block}
+	\begin{block}{GCC 1/2}
+ 		\begin{itemize}
+			\item Optymalizacje ogólnie:
+			\begin{itemize}
+			 \item \verb*%-p[g]% //profilowanie
+			 \item \verb*%-g[gdb],-Og% //debugowanie
+			 \item \verb*%-O{0,1,2,3}%
+			 \item \verb*%-ffast-math%
+			\end{itemize}
+ 			\item Optymalizacje pod konkretną architekturę:
+ 			 \begin{itemize}
+				\item \verb*%-m%
+				\item \verb*%-mtune%
+				\item \verb*%-march%
+				\item \verb*%-mfpmath% (przykład)
+ 			 \end{itemize}
+ 			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
+ 		\end{itemize}		
+ 	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Kompilator}
+	\begin{block}{Ogólnie}
+	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
+	\end{block}
+	\begin{block}{GCC 1/2}
+ 		\begin{itemize}
+			\item Warningi:
+			\begin{itemize}
+			 \item \verb*%-Wall%
+			 \item \verb*%-Wextra%
+			 \item \verb*%-Werror%
+			 \item \verb*%-pedantic%
+			 \item \verb*%-Wfloat-equal% //ciekawostka
+			\end{itemize}
+ 			\item Informacja o użytych optymalizacjach:
+ 			 \begin{itemize}
+				\item \verb*%-fstack-usage%
+				\item \verb*%-ftree-vectorizer-verbose%
+				\item \verb*%-fdump-tree-{vectorize,optimize}=stderr%
+				\item \verb*%-fopt-info-{optimized,vec-missed}%
+ 			 \end{itemize}
+ 		\end{itemize}		
+ 	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsection{Język}
 %\subsection{Biblioteki}
 %\subsection{Narzędzia}
