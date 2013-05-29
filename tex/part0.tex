@@ -22,11 +22,82 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Optymalizacja - uwag kilka}
+	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
+		\begin{itemize}
+			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
+			pomiędzy człowiekiem, softwarem i hardwarem.
+			\item Należy wiedzieć kiedy i gdzie ją stosować.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Kiedy 1/2}
+			\begin{quote}
+				"Premature optimization is the root of all evil" - Donald Knuth
+			\end{quote}
+			\begin{enumerate}
+				\item Get it right
+				\item Test it's right
+				\item Profile if slow
+				\item Optimise
+				\item If necessary repeat from 2
+ 			\end{enumerate}
+
+
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Optymalizacja - uwag kilka}
+	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
+		\begin{itemize}
+			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
+			pomiędzy człowiekiem, softwarem i hardwarem.
+			\item Należy wiedzieć kiedy i gdzie ją stosować.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Kiedy 2/2}
+ 			\begin{itemize}
+ 			 \item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu 
+ 			 przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez 
+ 			 czas potrzebny do sekwencyjnego dzielenia programu.
+ 			 \item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
+ 			 dla n procesorów wynosi 4x.
+ 			\end{itemize}		
+ 	\end{block}
+\end{frame}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Optymalizacja - uwag kilka}
+	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
+		\begin{itemize}
+			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
+			pomiędzy człowiekiem, softwarem i hardwarem.
+			\item Należy wiedzieć kiedy i gdzie ją stosować.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Gdzie}
+		\begin{itemize}
+			\item Czasami intuicja podpowiada nam które fragmenty kodu mogą wymagać
+			optymalizacji.Nie należy się domyślać, należy profilować!
+			\item Profilować można nie tylko czas wykonania (gprof), ale także wykorzystanie
+			cache'u (cachegrind).
+			\item Jednak niektóre optymalizacje lepiej zostawić kompilatorowi.
+			\item Co wykona się szybciej?
+			\begin{cpp}
+				val = val*12; 
+				//vs 
+				val = (val<<3) + (val<<2);
+			\end{cpp}
+
+
+			\url{http://stackoverflow.com/questions/6120207/imul-or-shift-instruction}
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Optymalizacja}
 	\begin{block}{Nazwa}
 		\begin{itemize}
 			\item trudno nawet marzyć o optimum
-			\item stosowane techniki czasem się wzajemnie ,,znoszą'' - bardzo nieliniowy proces
+			\item stosowane techniki czasem wzajemnie się ,,znoszą'' - bardzo nieliniowy proces
 			\item stąd superoptymalizacja: małe podproblemy, przeszukiwanie całej przestrzani rozwiązań i przerażające bithacki
 		\end{itemize}
 		\begin{quote}
