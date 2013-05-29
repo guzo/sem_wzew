@@ -206,7 +206,6 @@ co mozna wykorzystac
 						malo rejestrow w x86: fs/gs nieuzywane przez linucha, uzywa go pthreads
 							http://timetobleed.com/digging-out-the-craziest-bug-you-never-heard-about-from-2008-a-linux-threading-regression/: x86 and x86_64 processors are notorious for not having many registers available, however Linux does not use the FS and GS segment selectors for segmentation. So, the address of the TCB can be stored in FS or GS if it will fit.
 							For instance, Microsoft Windows on x86-64 uses the GS segment to point to the Thread Environment Block, a small data structure for each thread, which contains information about exception handling, thread-local variables, and other per-thread state. Similarly, the Linux kernel uses the GS segment to store per-CPU data.
-						lea
 						podobno nikt nie optymalizuje sprzetu pod stare instrukcje z x86, szczegolnie x87 (ponoc 5x wolniej)
 							porownac -mfpmath={387,sse}
 							-mtune is used predominantly for instruction scheduling, gcc uses it when it's reordering instructions to favour a specific micro-architecture over others. Code which is tuned for one microarchitecture will run on another chip of the same architecture, but the reordering may hurt performance on these chips.
@@ -234,7 +233,7 @@ co mozna wykorzystac
 					c++11: zmiany (relacja "sequenced before")
 				pamiec:
 					aliasing
-						zasady w C (diff z C++?):
+						zasady w C (FIXME: diff z C++?):
 							http://dbp-consulting.com/tutorials/StrictAliasing.html
 						rationale
 							zeby dalo sie korzystac z rejestrow a nie paranoja ze kazdy ptrwrite psuje wszystko
@@ -273,6 +272,8 @@ co mozna wykorzystac
 						uzyte vla
 						switche
 			typy: int vs. long/short, <stdint.h>, int_fast64_t
+		c
+			restrict
 		c++
 			kiedys: const (prawdziwy)/inline (teraz tez w c)
 			RVO/copy elision (!!!)

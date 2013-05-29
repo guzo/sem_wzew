@@ -14,4 +14,4 @@ for f in flags*.out; do
 	time ./$f $f.ppm 1024 > /dev/null
 done
 
-md5sum *.ppm
+md5sum *.ppm | sort

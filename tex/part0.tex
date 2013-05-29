@@ -32,30 +32,30 @@
 	\end{block}
 	\only<1>{
 	\begin{block}{Kiedy 1/2}
-			\begin{quote}
-				"Premature optimization is the root of all evil" - Donald Knuth
-			\end{quote}
-			\begin{enumerate}
-				\item Get it right
-				\item Test it's right
-				\item Profile if slow
-				\item Optimise
-				\item If necessary repeat from 2
- 			\end{enumerate}
+		\begin{quote}
+			"Premature optimization is the root of all evil" - Donald Knuth
+		\end{quote}
+		\begin{enumerate} % FIXME: quotesource
+			\item Get it right
+			\item Test it's right
+			\item Profile if slow
+			\item Optimise
+			\item If necessary repeat from 2
+		\end{enumerate}
 
 
 	\end{block} }
 	\only<2>{
 	\begin{block}{Kiedy 2/2}
-			\begin{itemize}
-			 \item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu
-			 przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez
-			 czas potrzebny do sekwencyjnego dzielenia programu.
-			 \item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
+		\begin{itemize}
+			\item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu
+			przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez
+			czas potrzebny do sekwencyjnego dzielenia programu.
+			\item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
 			 dla n procesorów wynosi 4x.
-			\end{itemize}
+		\end{itemize}
 	\end{block} }
-	\defverbatim{\imullst}{
+	\defverbatim{\imullst}{ %FIXME: dirty workaround I don't yet understand
 		\begin{cpp}
 			val = val*12;
 			//vs
