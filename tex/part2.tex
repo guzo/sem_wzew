@@ -1,5 +1,5 @@
-\section{Konkretne przykłady} %FIXME: mniej głupia nazwa
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Konkretne przykłady} %FIXME: mniej głupia nazwa
 \begin{frame}[fragile, allowframebreaks]{Przykładowe optymalizacje}
 	\begin{block}{Wybór algorytmu/architektury}
 		\begin{itemize}
@@ -86,7 +86,44 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Na poziomie języka wysokiego poziomu}
+\begin{frame}[fragile]{Enabling Transformations}
+	%FIXME: merge
+	\begin{block}{Loop unrolling}
+		\begin{itemize}
+		 \item Polega na rozwinięciu zagnieżdżonych pętli do dwuwymiarowej struktury zwanej
+		 wielokomórką.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Przykład}
+		Przykład?
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Enabling Transformations}
+	%FIXME: merge
+	\begin{block}{Loop unwiding} %FIXME nie podoba mi się ta optymalizacja - może by ją usunąć?
+		\begin{itemize}
+		 \item Polega wykonaniu kilku ``równorzędnych'' instrukcji w jednej pętli, przez co pomijane jest
+		 sprawdzanie warunku stopu.
+		\end{itemize}
+	\end{block}
+	\begin{block}{Przykład}
+		\begin{cpp}
+		for (x = 0; x < (int)1e8; x++)
+		{
+		    do_something(x);
+		}
+		for (x = 0; x < (int)1e8; x++)
+		{
+		    do_something(x);
+		    do_something(++x);
+		    do_something(++x);
+		    do_something(++x);
+		}
+		\end{cpp}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsection{Na poziomie IR}
 %\subsection{Na poziomie ASM}
 %\subsection{Osobno: pętle}

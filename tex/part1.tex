@@ -130,12 +130,12 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Kompilator}
+\begin{frame}[fragile]{Współpraca z kompilatorem}
 	%FIXME: \only<n>{}
 	\begin{block}{Ogólnie}
 	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
 	\end{block}
-	\begin{block}{GCC 1/2}
+	\begin{block}{GCC 2/2}
  		\begin{itemize}
 			\item Warningi:
 			\begin{itemize}
@@ -156,3 +156,42 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Współpraca z kompilatorem}
+	\begin{block}{Builtins/Intrinsics}
+		Funkcje i typy wbudowane w kompilator na przykład:
+		\begin{itemize}
+			\item \verb*%__builtin_expects({G_LIKELY,G_UNLIKELY})%
+			\item \verb*%__builtin_cpu_supports("sse2")%
+			\item \verb*%__m64 avariable%
+		\end{itemize}
+		\url{http://gcc.gnu.org/onlinedocs/gcc/X86-Built_002din-Functions.html}
+	\end{block}
+	\begin{block}{Wektoryzcja pętli (builtin)}
+		\begin{itemize}
+			\item \verb*%__m64 _mm_add_pi16%
+			\item \verb*%__m64 _mm_mullo_pi16%
+			\item \verb*%__m64 _mm_min_ps%
+		\end{itemize}
+		\url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Współpraca z kompilatorem}
+	Language extensions? Nie widze sensu, bo o tym już było. Pogadamy.
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Współpraca z kompilatorem}
+	\begin{block}{Attributes}
+		Pozwala nadawać atrybuty specjalne zmiennym, strukturom danych, typom, funkcjom.
+		\begin{itemize}
+			\item \verb*%int x __attribute__((aligned(16)))=0;% //zmienna
+			\item \verb*%int x[2] __attribute__ ((packed));% //jako czesc struktury %FIXME kod ze strukturą
+			\item \verb*%typedef int more_aligned_int %
+			\verb*%__attribute__ ((aligned (8)));% //typ %FIXME Monkey patch
+			\item \verb*%int old_fn () __attribute__ ((fastcall));% //funkcja
+			\item \verb*%void fatal () __attribute__ ((noreturn));%
+		\end{itemize}
+		\url{http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html}
+	\end{block}
+\end{frame}
