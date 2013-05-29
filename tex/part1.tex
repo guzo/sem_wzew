@@ -17,7 +17,7 @@
 	\begin{block}{Ogólnie}
 	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
 	\end{block}
-	\begin{block}{GCC 1/3}
+	\begin{block}{GCC 1/2}
  		\begin{itemize}
 			\item Optymalizacje ogólnie:
 			\begin{itemize}
@@ -34,6 +34,31 @@
 				\item \verb*%-mfpmath% (przykład)
  			 \end{itemize}
  			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
+ 		\end{itemize}		
+ 	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Kompilator}
+	\begin{block}{Ogólnie}
+	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
+	\end{block}
+	\begin{block}{GCC 1/2}
+ 		\begin{itemize}
+			\item Warningi:
+			\begin{itemize}
+			 \item \verb*%-Wall%
+			 \item \verb*%-Wextra%
+			 \item \verb*%-Werror%
+			 \item \verb*%-pedantic%
+			 \item \verb*%-Wfloat-equal% //ciekawostka
+			\end{itemize}
+ 			\item Informacja o użytych optymalizacjach:
+ 			 \begin{itemize}
+				\item \verb*%-fstack-usage%
+				\item \verb*%-ftree-vectorizer-verbose%
+				\item \verb*%-fdump-tree-{vectorize,optimize}=stderr%
+				\item \verb*%-fopt-info-{optimized,vec-missed}%
+ 			 \end{itemize}
  		\end{itemize}		
  	\end{block}
 \end{frame}
