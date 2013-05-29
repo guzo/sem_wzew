@@ -1,5 +1,32 @@
-%\section{Co można wykorzystać} %FIXME: mniej głupia nazwa
-%\subsection{Sprzęt}
+\section{Dostępne możliwości} %FIXME: mniej głupia nazwa
+\subsection{Sprzęt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{x86\_64}
+	\begin{block}{Nowości}
+		\begin{itemize}
+			\item Nowe rejestry: \textbf{SIMD} i \textbf{general purpose} (2x więcej niż w x86)
+			\item Nowe instrukcje: \textbf{lea} - load effective address (z myślą o operacjach
+			tablicowych, jednak można wykorzystać inaczej - przykład)
+		\end{itemize}
+	\end{block}
+	\begin{block}{GCC}
+ 		\begin{itemize}
+ 			 \item Optymalizacje pod konkretną architekturę:
+ 			 \begin{itemize}
+				\item \verb*%-mtune%
+				\item \verb*%-march%
+				\item \verb*%-mfpmath% (przykład)
+				\item ...
+ 			 \end{itemize}
+ 			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
+
+ 			 
+ 			 
+ 			 
+ 		\end{itemize}		
+ 	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsection{Język}
 %\subsection{Biblioteki}
 %\subsection{Narzędzia}
