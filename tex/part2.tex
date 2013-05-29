@@ -145,11 +145,11 @@
 	\end{block}
 	\begin{block}{Przykład}
 		\begin{cpp}
-		for (x = 0; x < (int)1e8; x++)
-		{
+		for (int x = 0; x < (int)1e8;)
+
 		    do_something(x);
 		}
-		for (x = 0; x < (int)1e8; x++)
+		for (int x = 0; x < (int)1e8;)
 		{
 		    do_something(x);
 		    do_something(++x);
