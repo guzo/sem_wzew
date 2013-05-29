@@ -84,6 +84,41 @@
 			\item stack reuse
 		\end{itemize}
 	\end{block}
+	\begin{block}{Runtime}
+		python, etc
+	\end{block}
+\end{frame}
+%FIXME why do you insist, LaTeX?
+\begin{frame}[fragile, allowframebreaks]{Pętle}
+	Dlaczego osobno?
+	\begin{block}{Memory access - istotne, warto pomóc}
+		\begin{itemize}
+			\item tiling/loop nest optimization: matmul
+			\item stripmining $=>$ automatic parallelisation/vectorisation - matmul
+				\begin{itemize}
+					\item dependencies (aliasing)
+					\item OpenMP
+				\end{itemize}
+			\item loop unrolling: matmul
+			\item loop interchange: matmul (row/column major)
+			\item loop fusion/fission
+			\item szczególne przypadki
+				\begin{itemize}
+					\item splitting
+					\item peeling
+					\item unswitching
+				\end{itemize}
+		\end{itemize}
+	\end{block}
+	\begin{block}{Drobne, czasem warto zostawić}
+		\begin{itemize}
+			\item factoring out of invariants
+			\item loop invariant code motion
+			\item induction variable elimination (była mowa)
+			\item rematerialization (troche jak xor reg,reg)
+			\item bounds checking elimination
+		\end{itemize}
+	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Enabling Transformations}
@@ -102,6 +137,7 @@
 \begin{frame}[fragile]{Enabling Transformations}
 	%FIXME: merge
 	\begin{block}{Loop unwiding} %FIXME nie podoba mi się ta optymalizacja - może by ją usunąć?
+	%A: absolutnie nie, bo jest upiornie istotna. Optymalizacje niemal z definicji "brzydkie"
 		\begin{itemize}
 		 \item Polega wykonaniu kilku ``równorzędnych'' instrukcji w jednej pętli, przez co pomijane jest
 		 sprawdzanie warunku stopu.
@@ -124,6 +160,3 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{Na poziomie IR}
-%\subsection{Na poziomie ASM}
-%\subsection{Osobno: pętle}
