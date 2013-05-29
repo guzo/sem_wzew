@@ -87,6 +87,21 @@
 	Language extensions? Nie widze sensu, bo o tym już było. Pogadamy.
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Współpraca z kompilatorem}
+	\begin{block}{Attributes}
+		Pozwala nadawać atrybuty specjalne zmiennym, strukturom danych, typom, funkcjom.
+		\begin{itemize}
+			\item \verb*%int x __attribute__((aligned(16)))=0;% //zmienna
+			\item \verb*%int x[2] __attribute__ ((packed));% //jako czesc struktury %FIXME kod ze strukturą
+			\item \verb*%typedef int more_aligned_int %
+			\verb*%__attribute__ ((aligned (8)));% //typ %FIXME Monkey patch
+			\item \verb*%int old_fn () __attribute__ ((fastcall));% //funkcja
+			\item \verb*%void fatal () __attribute__ ((noreturn));%
+		\end{itemize}
+		\url{http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html}
+	\end{block}
+\end{frame}
 %\subsection{Język}
 %\subsection{Biblioteki}
 %\subsection{Narzędzia}

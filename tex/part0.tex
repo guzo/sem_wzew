@@ -22,14 +22,15 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Optymalizacja - uwag kilka}
+\begin{frame}[fragile]{Optymalizacja - uwag kilka}
 	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
 		\begin{itemize}
-			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
+			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca
 			pomiędzy człowiekiem, softwarem i hardwarem.
 			\item Należy wiedzieć kiedy i gdzie ją stosować.
 		\end{itemize}
 	\end{block}
+	\only<1>{
 	\begin{block}{Kiedy 1/2}
 			\begin{quote}
 				"Premature optimization is the root of all evil" - Donald Knuth
@@ -41,36 +42,24 @@
 				\item Optimise
 				\item If necessary repeat from 2
  			\end{enumerate}
-	\end{block}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Optymalizacja - uwag kilka}
-	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
-		\begin{itemize}
-			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
-			pomiędzy człowiekiem, softwarem i hardwarem.
-			\item Należy wiedzieć kiedy i gdzie ją stosować.
-		\end{itemize}
-	\end{block}
+	\end{block} }
+	\only<2>{
 	\begin{block}{Kiedy 2/2}
- 			\begin{itemize}
- 			 \item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu 
- 			 przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez 
- 			 czas potrzebny do sekwencyjnego dzielenia programu.
- 			 \item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
- 			 dla n procesorów wynosi 4x.
- 			\end{itemize}		
- 	\end{block}
-\end{frame}
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Optymalizacja - uwag kilka}
-	\begin{block}{} %FIXME sensowny tytuł akapitu (podział?)
-		\begin{itemize}
-			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca 
-			pomiędzy człowiekiem, softwarem i hardwarem.
-			\item Należy wiedzieć kiedy i gdzie ją stosować.
-		\end{itemize}
-	\end{block}
+			\begin{itemize}
+			 \item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu
+			 przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez
+			 czas potrzebny do sekwencyjnego dzielenia programu.
+			 \item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
+			 dla n procesorów wynosi 4x.
+			\end{itemize}
+	\end{block} }
+	\defverbatim{\imullst}{
+		\begin{cpp}
+			val = val*12;
+			//vs
+			val = (val<<3) + (val<<2);
+		\end{cpp}}
+	\only<3>{
 	\begin{block}{Gdzie}
 		\begin{itemize}
 			\item Czasami intuicja podpowiada nam które fragmenty kodu mogą wymagać
@@ -79,16 +68,11 @@
 			cache'u (cachegrind).
 			\item Jednak niektóre optymalizacje lepiej zostawić kompilatorowi.
 			\item Co wykona się szybciej?
-			\begin{cpp}
-				val = val*12; 
-				//vs 
-				val = (val<<3) + (val<<2);
-			\end{cpp}
 
-
-			\url{http://stackoverflow.com/questions/6120207/imul-or-shift-instruction}
+			\imullst
+			\url{http://stackoverflow.com/questions/6120207/}
 		\end{itemize}
-	\end{block}
+	\end{block} }
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Optymalizacja}
