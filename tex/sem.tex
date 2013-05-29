@@ -1,4 +1,4 @@
-\documentclass[10pt]{beamer}
+\documentclass[9pt]{beamer}
 
 \usepackage{polski}
 \usepackage[utf8]{inputenc}
@@ -17,7 +17,7 @@
 	showstringspaces=true,
 	breaklines=true, breakatwhitespace=true,
 	captionpos=b, mathescape=true,
-	basicstyle=\tiny, frame=single,
+	basicstyle=\tiny, frame=single
 }
 \lstnewenvironment{c99}   {\lstset{language=C     }}{}
 \lstnewenvironment{cpp}   {\lstset{language=C++   }}{}
@@ -28,6 +28,7 @@
 \usetheme{Warsaw}
 \begin{document}
 \setbeamercovered{dynamic}
+\setbeamertemplate{frametitle continuation}{}
 
 \frame{\maketitle}
 \frame{\tableofcontents}

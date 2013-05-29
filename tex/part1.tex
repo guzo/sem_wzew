@@ -1,5 +1,16 @@
 \section{Dostępne możliwości} %FIXME: mniej głupia nazwa
 \subsection{Sprzęt}
+\begin{frame}{Coraz trudniej}
+	\begin{block}{Zasada Moore'a}
+		\begin{itemize}
+			\item co kilkanaście miesięcy mamy do dyspozycji $2\times$ więcej tranzystorów
+			\item szkoda że od około 2003 nie ma co liczyć na przyspieszenie zegarów (,,frequency wall'')
+			\item ,,memory wall'' - kiedyś dostęp do pamięci był tani, a obliczenia drogie. Teraz jest odwrotnie.
+			\item ,,Latency lags bandwith'' (David A. Patterson)
+			\item $c \approx 3e8\frac{m}{s} \approx 10 \frac{cm}{clk}~@3GHz$ - w próźni
+		\end{itemize}
+	\end{block}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{x86\_64}
 	\begin{block}{Nowości}
@@ -13,7 +24,75 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Język}
+\begin{frame}[fragile, allowframebreaks]{,,Zachowania'' w C i pokrewnych językach}
+	%FIXME: ideal order: def, xkcd, iocc, seq, mem, keywords - but doesn't render if I try
+	\begin{block}{Dostępne dla programisty}
+		\begin{itemize}
+			\item \verb*%register%/\verb*%volatile%
+			\item \verb*%static%/\verb*%auto%/\verb*%extern%
+			\item \verb*%switch% - ,,most high-level feature of C''
+			\item \verb*%restrict% (\verb*%C99%)
+			\item \verb*%inline%/\verb*%const%/\verb*%constexpr%/\verb*%extern%
+			\begin{itemize}
+				\item vs. makra
+				\item vs. \verb*%template% (unrolling)
+				\item vs. rekursja, \verb*%&%, \verb*%vla%, \verb*%-fno-inline%
+			\end{itemize}
+			\item typy: jak (wg. standardu) ma się \verb*%int% do \verb*%long% i \verb*%short%? \verb*%<stdiont.h>%, \verb*%int_fast*_t%
+			\item RVO/copy elision
+			\item \verb*%C++11%: \verb*%alignof%/\verb*%alignas%, \verb*%noexcept%, move semantics
+		\end{itemize}
+	\end{block}
+	\begin{block}{Definicje}
+		\small\begin{quote}
+			The semantic descriptions in this International Standard define a \textbf{parameterized nondeterministic abstract machine}.
+
+			Certain aspects and operations of the abstract machine are described in this International Standard as \textbf{implementation-defined} (for example, sizeof(int)). These constitute the parameters of the abstract machine. Each implementation shall include documentation describing its characteristics and behavior in these respects.
+
+			Certain other aspects and operations of the abstract machine are described in this International Standard as  \textbf{unspecified} (for example, order of evaluation of arguments to a function). Where possible, this International Standard defines a set of allowable behaviors. These define the nondeterministic aspects of the abstract machine.
+
+			Certain other operations are described in this International Standard as  \textbf{undefined} (for example, the effect of dereferencing the null pointer). [ Note: this International Standard imposes no requirements on the behavior of programs that contain undefined behavior. —end note ]
+		\end{quote}
+	\end{block}
+	\begin{block}{W skrócie}
+		\begin{figure}[h]
+			\includegraphics[width=0.8\textwidth]{gfx/undef_xkcd}
+			\caption{Źródło: \url{http://xkcd.com/292/}, na licencji CC-BY-NC. kod: H.264 reference implementation.}
+		\end{figure}
+	\end{block}
+	\begin{block}{IOCC, Underhanded C Contest}
+		\begin{quote}
+			If your source file is over 200 lines, you are not likely to win. You can hide a semi truck in 300 lines of C.
+		\end{quote}
+	\end{block}
+	\begin{block}{Pamięć}
+		\begin{itemize}
+			\item aliasing
+			\item alignment
+			\item value representation (\verb*%true_true.c%)
+			\item rationale
+		\end{itemize}
+	\end{block}
+	\begin{block}{Punkty sekwencyjne, kolejność wykonania}
+		\begin{itemize}
+			\item czym są i co w nich jest undefined/unspecified
+			\item \lstinline[language=c]!foo() + bar() + baz();!
+			\item \lstinline[language=c]!i = ++i;!
+			\item vs. Java
+			\item vs. \verb*%C++11%: zmiany (relacja ,,sequenced before'')
+			\item dlaczego?
+			\item Przykład: duży i konkretny
+			\begin{figure}[h]
+				\includegraphics[width=0.8\textwidth]{gfx/unspec_compilers}
+				\caption{Źródło: \url{http://www.pvv.org/~oma/UnspecifiedAndUndefined_ACCU_Apr2013.pdf}.}
+			\end{figure}
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Kompilator}
+	%FIXME: \only<n>{}
 	\begin{block}{Ogólnie}
 	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
 	\end{block}
@@ -32,13 +111,14 @@
 				\item \verb*%-mtune%
 				\item \verb*%-march%
 				\item \verb*%-mfpmath% (przykład)
- 			 \end{itemize}
- 			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
- 		\end{itemize}		
- 	\end{block}
+			 \end{itemize}
+			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
+		\end{itemize}
+	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Współpraca z kompilatorem}
+	%FIXME: \only<n>{}
 	\begin{block}{Ogólnie}
 	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
 	\end{block}
@@ -58,9 +138,9 @@
 				\item \verb*%-ftree-vectorizer-verbose%
 				\item \verb*%-fdump-tree-{vectorize,optimize}=stderr%
 				\item \verb*%-fopt-info-{optimized,vec-missed}%
- 			 \end{itemize}
- 		\end{itemize}		
- 	\end{block}
+			 \end{itemize}
+		\end{itemize}
+	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Współpraca z kompilatorem}
@@ -102,6 +182,5 @@
 		\url{http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html}
 	\end{block}
 \end{frame}
-%\subsection{Język}
 %\subsection{Biblioteki}
 %\subsection{Narzędzia}
