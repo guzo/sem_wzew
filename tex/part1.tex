@@ -91,6 +91,19 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Biblioteki}
+\begin{frame}[fragile]{Kompilator}
+	\begin{itemize}
+		\item SSO
+		\item COW
+		\item GPU
+		\item problem z fuzją - Halide
+		\item nie zawsze należy ufać (,,3 beautiful quicksorts'')
+		\item builtins
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Narzędzia}
 \begin{frame}[fragile]{Kompilator}
 	%FIXME: \only<n>{}
 	\begin{block}{Ogólnie}
@@ -154,13 +167,13 @@
 		\url{http://gcc.gnu.org/onlinedocs/gcc/X86-Built_002din-Functions.html}
 	\end{block}
 	\begin{block}{Wektoryzcja pętli (builtin)}
- 		\begin{itemize}
+		\begin{itemize}
 			\item \verb*%__m64 _mm_add_pi16%
 			\item \verb*%__m64 _mm_mullo_pi16%
 			\item \verb*%__m64 _mm_min_ps%
- 		\end{itemize}
- 		\url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html}
- 	\end{block}
+		\end{itemize}
+		\url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html}
+	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Współpraca z kompilatorem}
@@ -182,5 +195,3 @@
 		\url{http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html}
 	\end{block}
 \end{frame}
-%\subsection{Biblioteki}
-%\subsection{Narzędzia}
