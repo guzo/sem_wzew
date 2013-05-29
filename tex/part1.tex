@@ -1,6 +1,6 @@
 \section{Możliwości} %FIXME: mniej głupia nazwa
 \subsection{Sprzęt}
-\begin{frame}{Coraz trudniej}
+\begin{frame}[fragile, allowframebreaks]{Coraz trudniej}
 	\begin{block}{Zasada Moore'a}
 		\begin{itemize}
 			\item co kilkanaście miesięcy mamy do dyspozycji $2\times$ więcej tranzystorów
@@ -8,6 +8,60 @@
 			\item ,,memory wall'' - kiedyś dostęp do pamięci był tani, a obliczenia drogie. Teraz jest odwrotnie.
 			\item ,,Latency lags bandwith'' (David A. Patterson)
 			\item $c \approx 3e8\frac{m}{s} \approx 10 \frac{cm}{clk}~@3GHz$ - w próźni
+		\end{itemize}
+	\end{block}
+	\begin{block}{Decyzje}
+		\begin{itemize}
+			\item manycore vs. multicore
+			\item RISC vs. CISC (ręcznie)
+		\end{itemize}
+	\end{block}
+	\begin{block}{Pamięć, cache}
+		\begin{itemize}
+			\item Hierarchiczny cache (per-core, współdzielony LLC)
+			\item Hierarchiczny TLB
+			\item prędkości (DRAM vs. SRAM):
+			\begin{verbatim}
+				register ~ 1clk
+				L1  ~      3clk
+				L2  ~     15clk
+				L3  ~ 50-100clk
+				mem ~    200clk
+			\end{verbatim}
+			\item page coloring
+			\item demo: HS vs. QS
+			\item demo: gallery of processor cache effects
+			\item wzmianka, potem demo: cache oblivious
+			\item cachegrind
+			\item cache coherence protocols
+		\end{itemize}
+	\end{block}
+	\begin{block}{Pipelining, ILP}
+		Static/dynamic ILP
+		\begin{itemize}
+			\item cache miss - pipeline stall
+			\item branch - pipeline flush
+			\begin{itemize}
+				\item inlining/unrolling
+				\item branching model (status/predicate register)
+				\item nadmiar rejestrow
+				\item dependency detection
+				\item branch predictor
+				\item speculative execution
+				\item store buffer/L0
+				\item OOO
+				\item delay slots
+			\end{itemize}
+			\item demo: himrbp
+		\end{itemize}
+	\end{block}
+	\begin{block}{SIMD}
+		\begin{itemize}
+			\item MMX: 64b
+			\item MMX - 64b
+			\item SSE - 128b
+			\item AVX - 256b
+			\item MIC's VPU - 512b
 		\end{itemize}
 	\end{block}
 \end{frame}
