@@ -1,5 +1,91 @@
-%\section{Konkretne przykłady} %FIXME: mniej głupia nazwa
-%\subsection{Na etapie projektowania}
+\section{Konkretne przykłady} %FIXME: mniej głupia nazwa
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Przykładowe optymalizacje}
+	\begin{block}{Wybór algorytmu/architektury}
+		\begin{itemize}
+			\item Złożoność obliczeniowa
+				\begin{itemize}
+					\item indeksowanie w bazach danych (nlgn+klgn vs. kn)
+					\item QS/SS, fallback
+					\item QS/HS
+					\item custom heap w QS
+					\item buforowanie (przykład)
+					\item fajne-na-papierze-niepraktyczne-w-realu mnozenia macierzy: \url{http://en.wikipedia.org/wiki/File:Bound_on_matrix_multiplication_omega_over_time.svg}
+				\end{itemize}
+			\item Lazy evaluation
+			\item Memory access patterns
+				\begin{itemize}
+					\item AoS vs. SoA, row/column major
+					\item cache aware (liniowo, reuse, jawny prefetch)
+					\item cache oblivious
+				\end{itemize}
+		\end{itemize}
+	\end{block}
+	\begin{block}{Na poziomie kodu źródłowego}
+		\begin{itemize}
+			\item inlining
+				\begin{itemize}
+					\item enabling transform dla m.in. zwijania/optymalizacji wykorzystania rejestrów
+					\item przy małych funkcjach (gettery!) - więcej kodu na wywołanie i sprzątanie niż na ciało
+					\item funkcje użyte tylko raz (bo przejrzystość) (static)
+				\end{itemize}
+			\item loop unrolling
+				\begin{itemize}
+					\item trochę pokrewne z inline
+					\item I\$
+					\item dawniej: Duff's device
+					\item \#pragma - intel
+					\item \verb*%BOOST_PP%
+				\end{itemize}
+			\item tail recursion elimination
+			\item dead code elimination
+			\item jump threading
+		\end{itemize}
+	\end{block}
+	\begin{block}{Na poziomie IR}
+		\begin{itemize}
+			\item dead code elimination
+				\begin{itemize}
+					\item available expression analysis
+					\item live variable analysis
+					\item global value numbering
+				\end{itemize}
+			\item peephole/window optimization (kategoria)
+				\begin{itemize}
+					\item strength reduction (demo)
+					\item constant folding
+				\end{itemize}
+			\item tail recursion elimination
+			\item jump threading
+		\end{itemize}
+	\end{block}
+	\begin{block}{Na poziomie asm/przejście z IR}
+		\begin{itemize}
+			\item register allocation
+				\begin{itemize}
+					\item available expression analysis
+					\item live variable analysis
+					\item global value numbering
+				\end{itemize}
+			\item instruction selection - jedna z metod strength reduction
+				\begin{itemize}
+					\item lea zamiast prostych mnozen (bez side effcts, ustalone argumenty)
+					\item "Like any good optimization, it makes the implementation a bit messier, but doesn't affect the interface."
+					\item shifty zamiast mnozen/dzielen przez 2**n
+					\item xor reg, reg vs. mov reg, 0
+					\item "Division by Invariant Integers using Multiplication"
+					\item http://www.nynaeve.net/?p=64
+					\item prostsza matematyka: 	-fast-math, flush to 0, denorm, takietam,	bitshifty zamiast mnozen
+					\item demo: \verb*%src/common/common_optimizations.ctel%
+				\end{itemize}
+			\item callconv
+			\item vectorization
+			\item -mtune
+			\item stack reuse
+		\end{itemize}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\subsection{Na poziomie języka wysokiego poziomu}
 %\subsection{Na poziomie IR}
 %\subsection{Na poziomie ASM}
