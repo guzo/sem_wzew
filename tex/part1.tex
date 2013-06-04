@@ -1,103 +1,100 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Możliwości} %FIXME: mniej głupia nazwa
 \subsection{Sprzęt}
 \begin{frame}[fragile, allowframebreaks]{Coraz trudniej}
 	\begin{block}{Zasada Moore'a}
 		\begin{itemize}
-			\item co kilkanaście miesięcy mamy do dyspozycji $2\times$ więcej tranzystorów
-			\item szkoda że od około 2003 nie ma co liczyć na przyspieszenie zegarów (,,frequency wall'')
+			\item co kilkanaście miesięcy mamy do dyspozycji $2\times$ więcej tranzystorów.
+			\item szkoda że od około 2003 nie ma co liczyć na przyspieszenie zegarów (,,frequency wall'').
 			\item ,,memory wall'' - kiedyś dostęp do pamięci był tani, a obliczenia drogie. Teraz jest odwrotnie.
-			\item ,,Latency lags bandwith'' (David A. Patterson)
-			\item $c \approx 3e8\frac{m}{s} \approx 10 \frac{cm}{clk}~@3GHz$ - w próźni
+			\item ,,latency wall'': w czasie, kiedy wystarcza na podwojenie przepustowości procesorów/pamięci/dysków/sieci opóźnienia spadają tylko 1.2-1.3$\times$ (David A. Patterson : ,,Latency lags bandwith'')
+			\item ,,speed wall'': $c \approx 3e8\frac{m}{s} \approx 10 \frac{cm}{clk}~@3GHz$ - w próźni
 		\end{itemize}
 	\end{block}
 	\begin{block}{Decyzje}
 		\begin{itemize}
 			\item manycore vs. multicore
-			\item RISC vs. CISC (ręcznie)
+			\item RISC vs. CISC (wygodny pipeline vs. łatwo ręcznie; \verb*%x86%)
 		\end{itemize}
 	\end{block}
-	\begin{block}{Pamięć, cache}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Pamięć, cache}
+	\begin{itemize}
+		\item Prędkości (orientacyjnie):
+		\begin{verbatim}
+			reg ~       1clk
+			L1  ~       3clk
+			L2  ~      15clk
+			L3  ~  50-100clk
+			mem ~ 100-400clk
+		\end{verbatim}
+		\item Hierarchiczny cache (per-core, współdzielony LLC, ,,harwardzki TLC'', CC: MESI i pokrewne)
 		\begin{itemize}
-			\item Hierarchiczny cache (per-core, współdzielony LLC)
-			\item Hierarchiczny TLB
-			\item prędkości (DRAM vs. SRAM):
-			\begin{verbatim}
-				register ~ 1clk
-				L1  ~      3clk
-				L2  ~     15clk
-				L3  ~ 50-100clk
-				mem ~    200clk
-			\end{verbatim}
 			\item page coloring
-			\item demo: HS vs. QS
-			\item demo: gallery of processor cache effects
-			\item wzmianka, potem demo: cache oblivious
+			\item HS vs. QS
+			\item później demo: ,,Gallery of processor cache effects''
+			\item cache oblivious algorithms
 			\item cachegrind
-			\item cache coherence protocols
 		\end{itemize}
-	\end{block}
-	\begin{block}{Pipelining, ILP}
-		Static/dynamic ILP
+		\item Hierarchiczny TLB
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Quicksort vs. Heapsort: wykorzystanie cache'a}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\textwidth]{gfx/cache_bentley}
+		\caption{Źródło: Jon Bentley: ,,Three Beautiful Quicksorts'': \url{http://www.youtube.com/watch?v=QvgYAQzg1z8}}
+	\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Pipelining}
+	\begin{figure}[h]
+		\includegraphics[width=0.6\textwidth]{gfx/pipelining}
+		\caption{Źródło: \url{http://en.wikipedia.org/wiki/File:5_Stage_Pipeline.svg}}
+	\end{figure}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{ILP}
+	Static/dynamic ILP
+	\begin{itemize}
+		\item Pipelining (problem: branch == pipeline flush)
 		\begin{itemize}
-			\item cache miss - pipeline stall
-			\item branch - pipeline flush
-			\begin{itemize}
-				\item inlining/unrolling
-				\item branching model (status/predicate register)
-				\item nadmiar rejestrow
-				\item dependency detection
-				\item branch predictor
-				\item speculative execution
-				\item store buffer/L0
-				\item OOO
-				\item delay slots
-			\end{itemize}
+			\item inlining/unrolling
+			\item delay slots
+			\item branch predictor
+			\item dependency detection (\verb*%a[i++]% vs. \verb*%a[++i]%)
+			\item speculative execution, nadmiar rejestrow, store buffer/L0
+			\item \verb*%CMOVcc%
 			\item demo: himrbp
 		\end{itemize}
-	\end{block}
-	\begin{block}{SIMD}
-		\begin{itemize}
-			\item MMX: 64b
-			\item MMX - 64b
-			\item SSE - 128b
-			\item AVX - 256b
-			\item MIC's VPU - 512b
-		\end{itemize}
-	\end{block}
+		\item cache miss == pipeline stall: OOO, HW threads, superscalar
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{SIMD}
+	\begin{itemize}
+		\item MMX - 64b
+		\item SSE - 128b
+		\item AVX - 256b
+		\item MIC's VPU - 512b
+	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{x86\_64}
 	\begin{block}{Nowości}
 		\begin{itemize}
-			\item Nowe rejestry: \textbf{SIMD} i \textbf{general purpose} (2x więcej niż w x86)
-			\item Nowe instrukcje: \textbf{lea} - load effective address (z myślą o operacjach
-			tablicowych, jednak można wykorzystać inaczej - przykład)
-			\item Adresowanie 64-bitowe (większe zmienne + więcej pamięci)
-			\item Rozszerzenia (dla i7): MMX, SSE, SSE2, SSE3, SSSE3, SSE4.1, SSE4.2, AVX, AES, PCLMUL;
+			\item Nowe rejestry: \textbf{SIMD} i \textbf{general purpose} (tych $2\times$ więcej niż w x86)
+			\item Nowe instrukcje dla tychże
+			\item Większe rejestry: większe zmienne, większa przestrzeń adresowa (tak wirtualna jak i fizyczna, tak w trybie 64-bitowym jak i w PAE)
+			\item Łatwiejsze tworzenie PIC: adresowanie wzgledem RIP
+			\item Bit \texttt{NX}
 		\end{itemize}
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Język}
 \begin{frame}[fragile, allowframebreaks]{,,Zachowania'' w C i pokrewnych językach}
-	%FIXME: ideal order: def, xkcd, iocc, seq, mem, keywords - but doesn't render if I try
-	\begin{block}{Dostępne dla programisty}
-		\begin{itemize}
-			\item \verb*%register%/\verb*%volatile%
-			\item \verb*%static%/\verb*%auto%/\verb*%extern%
-			\item \verb*%switch% - ,,most high-level feature of C''
-			\item \verb*%restrict% (\verb*%C99%)
-			\item \verb*%inline%/\verb*%const%/\verb*%constexpr%/\verb*%extern%
-			\begin{itemize}
-				\item vs. makra
-				\item vs. \verb*%template% (unrolling)
-				\item vs. rekursja, \verb*%&%, \verb*%vla%, \verb*%-fno-inline%
-			\end{itemize}
-			\item typy: jak (wg. standardu) ma się \verb*%int% do \verb*%long% i \verb*%short%? \verb*%<stdiont.h>%, \verb*%int_fast*_t%
-			\item RVO/copy elision
-			\item \verb*%C++11%: \verb*%alignof%/\verb*%alignas%, \verb*%noexcept%, move semantics
-		\end{itemize}
-	\end{block}
 	\begin{block}{Definicje}
 		\small\begin{quote}
 			The semantic descriptions in this International Standard define a \textbf{parameterized nondeterministic abstract machine}.
@@ -120,29 +117,50 @@
 			If your source file is over 200 lines, you are not likely to win. You can hide a semi truck in 300 lines of C.
 		\end{quote}
 	\end{block}
-	\begin{block}{Pamięć}
-		\begin{itemize}
-			\item aliasing
-			\item alignment
-			\item value representation (\verb*%true_true.c%)
-			\item rationale
-		\end{itemize}
-	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Konkretne przykłady tychże}
 	\begin{block}{Punkty sekwencyjne, kolejność wykonania}
 		\begin{itemize}
-			\item czym są i co w nich jest undefined/unspecified
-			\item \lstinline[language=c]!foo() + bar() + baz();!
-			\item \lstinline[language=c]!i = ++i;!
+			\item czym są i co w nich jest ,,undefined''/,,unspecified''
+			\item \lstinline[language=c]!foo() + bar() + baz();!,  \lstinline[language=c]!i = ++i;!
 			\item vs. Java
 			\item vs. \verb*%C++11%: zmiany (relacja ,,sequenced before'')
 			\item dlaczego?
-			\item Przykład: duży i konkretny
-			\begin{figure}[h]
-				\includegraphics[width=0.8\textwidth]{gfx/unspec_compilers}
-				\caption{Źródło: \url{http://www.pvv.org/~oma/UnspecifiedAndUndefined_ACCU_Apr2013.pdf}.}
-			\end{figure}
+			\item dlaczego standard nie gwarantuje warningów?
 		\end{itemize}
+		\begin{figure}[h]
+			\includegraphics[width=0.75\textwidth]{gfx/unspec_compilers}
+			\caption{ \tiny\url{http://www.pvv.org/~oma/UnspecifiedAndUndefined_ACCU_Apr2013.pdf}.}
+		\end{figure}
 	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Problemy z pamięcią}
+	\begin{itemize}
+		\item aliasing (vs. \texttt{FORTRAN}): wskaźniki vs. offsety, atrybuty, lokalność, \texttt{static}, \texttt{-fno-strict-aliasing}
+		\item alignment
+		\item value representation (\verb*%true_true.c%)
+		\item rationale
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Jak C pomaga programiście pomóc sobie}
+	\begin{itemize}
+		\item \verb*%register%/\verb*%volatile%
+		\item \verb*%static%/\verb*%auto%/\verb*%extern%
+		\item \verb*%switch% - ,,most high-level feature of C''
+		\item \verb*%restrict% (\verb*%C99%)
+		\item \verb*%inline%/\verb*%const%/\verb*%constexpr%/\verb*%extern%
+		\begin{itemize}
+			\item vs. makra
+			\item vs. \verb*%template% (unrolling)
+			\item vs. rekursja, \verb*%&%, \verb*%vla%, \verb*%-fno-inline%
+		\end{itemize}
+		\item typy: jak (wg. standardu) ma się \verb*%int% do \verb*%long% i \verb*%short%? \verb*%<stdiont.h>%, \verb*%int_fast*_t%
+		\item RVO/copy elision
+		\item \verb*%C++11%: \verb*%alignof%/\verb*%alignas%, \verb*%noexcept%, move semantics, optymalizacja exception handling
+	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Biblioteki}
@@ -152,99 +170,73 @@
 		\item COW
 		\item GPU
 		\item problem z fuzją - Halide
-		\item nie zawsze należy ufać (,,3 beautiful quicksorts'')
+		\item nie zawsze należy ufać (,,Three Beautiful Quicksorts'')
 		\item builtins
 	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Narzędzia}
-\begin{frame}[fragile]{Kompilator}
-	%FIXME: \only<n>{}
-	\begin{block}{Ogólnie}
-	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
-	\end{block}
-	\begin{block}{GCC 1/2}
- 		\begin{itemize}
-			\item Optymalizacje ogólnie:
-			\begin{itemize}
-			 \item \verb*%-p[g]% //profilowanie
-			 \item \verb*%-g[gdb],-Og% //debugowanie
-			 \item \verb*%-O{0,1,2,3}%
-			 \item \verb*%-ffast-math%
-			\end{itemize}
- 			\item Optymalizacje pod konkretną architekturę:
- 			 \begin{itemize}
-				\item \verb*%-m%
-				\item \verb*%-mtune%
-				\item \verb*%-march%
-				\item \verb*%-mfpmath% (przykład)
-			 \end{itemize}
-			 \url{http://gcc.gnu.org/onlinedocs/gcc/i386-and-x86_002d64-Options.html}
-		\end{itemize}
-	\end{block}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile]{Współpraca z kompilatorem}
-	%FIXME: \only<n>{}
-	\begin{block}{Ogólnie}
-	 Kompilator (z łaciny \textit{compilare}) - grabieżca %FIXME łacińskie literki w compilare
-	\end{block}
-	\begin{block}{GCC 2/2}
- 		\begin{itemize}
-			\item Warningi:
-			\begin{itemize}
-			 \item \verb*%-Wall%
-			 \item \verb*%-Wextra%
-			 \item \verb*%-Werror%
-			 \item \verb*%-pedantic%
-			 \item \verb*%-Wfloat-equal% //ciekawostka
-			\end{itemize}
- 			\item Informacja o użytych optymalizacjach:
- 			 \begin{itemize}
-				\item \verb*%-fstack-usage%
-				\item \verb*%-ftree-vectorizer-verbose%
-				\item \verb*%-fdump-tree-{vectorize,optimize}=stderr%
-				\item \verb*%-fopt-info-{optimized,vec-missed}%
-			 \end{itemize}
-		\end{itemize}
-	\end{block}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]{Współpraca z kompilatorem}
-	\begin{block}{Builtins/Intrinsics}
-		Funkcje i typy wbudowane w kompilator na przykład:
+\begin{frame}[fragile]{Narzędzia}
+	\begin{itemize}
+		\item profilery: \texttt{gprof}, \texttt{cachegrind}
+		\item packery: \texttt{upx}
+		\item kompilatory: \texttt{gcc-4.8}
 		\begin{itemize}
-			\item \verb*%__builtin_expects({G_LIKELY,G_UNLIKELY})%
+			\item Generowany kod:
+			\begin{itemize}
+				\item \verb*%-p[g]%, PGO: \texttt{-fprofile-generate}, \texttt{-fprofile-use}
+				\item \verb*%-g[gdb], -Og%, warningi
+				\item \verb*%-O{0,1,2,3,s,fast}%, \verb*%-ffast-math%
+				\item \verb*%-m{32,x32,64}%, \verb*%-mtune=*%, \verb*%-mfpmath={387,sse}%, \verb*%-m{96,128}bit-long-double%
+				\item \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Optimize-Options.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/i386-and-x86_002d64-Options.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Code-Gen-Options.html}
+			\end{itemize}
+			\item Informacje o generowanym kodzie
+			\begin{itemize}
+				\item \texttt{-fstack-usage}
+				\item \texttt{-ftree-vectorizer-verbose=*}
+				\item \texttt{-fdump-tree-{vectorize,optimize}=stderr=*}
+				\item \texttt{-fdump-tree-{optimized,vec-missed}=stderr=*}
+			\end{itemize}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Kompilator}
+	\begin{block}{Intrinsics}
+		Cień nadziei na szczątkową przenośność między procesorami, gorzej z kompilatorami.
+		\begin{itemize}
+			\item \verb*%__builtin_expect%
 			\item \verb*%__builtin_cpu_supports("sse2")%
-			\item \verb*%__m64 avariable%
-		\end{itemize}
-		\url{http://gcc.gnu.org/onlinedocs/gcc/X86-Built_002din-Functions.html}
-	\end{block}
-	\begin{block}{Wektoryzcja pętli (builtin)}
-		\begin{itemize}
-			\item \verb*%__m64 _mm_add_pi16%
-			\item \verb*%__m64 _mm_mullo_pi16%
-			\item \verb*%__m64 _mm_min_ps%
 		\end{itemize}
 		\url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html}
+		\url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/X86-Built_002din-Functions.html}
 	\end{block}
 	\begin{block}{Language extensions}
-		%FIXME: Links
 		\begin{itemize}
-			\item GCC: extended asm
-			\item GCC: explicit reg vars:
+			\item GCC: extended asm (ostrożnie, spill rejestrów)
+			\item GCC: explicit reg vars
 		\end{itemize}
 	\end{block}
-	\begin{block}{Attributes}
-		Pozwala nadawać atrybuty specjalne zmiennym, strukturom danych, typom, funkcjom.
+	\begin{block}{\texttt{\#pragma}}
 		\begin{itemize}
-			\item \verb*%int x __attribute__((aligned(16)))=0;% //zmienna
-			\item \verb*%int x[2] __attribute__ ((packed));% //jako czesc struktury %FIXME kod ze strukturą
-			\item \verb*%typedef int more_aligned_int %
-			\verb*%__attribute__ ((aligned (8)));% //typ %FIXME Monkey patch
-			\item \verb*%int old_fn () __attribute__ ((fastcall));% //funkcja
-			\item \verb*%void fatal () __attribute__ ((noreturn));%
+			\item sztywna składnia
+			\item OpenMP
+			\item icc
 		\end{itemize}
-		\url{http://gcc.gnu.org/onlinedocs/gcc/Function-Attributes.html}
+	\end{block}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile, allowframebreaks]{Kompilator: intrinsics}
+	\begin{block}{Attributes}
+		Pozwala nadawać atrybuty specjalne zmiennym, strukturom danych, typom, funkcjom. Wygodniejsza składnia, podobna konstrukcja w \texttt{C++11}
+		\begin{itemize}
+			\item \verb*%aligned% \verb*%packed%
+			\item \verb*%fastcall%
+			\item \verb*%noreturn%
+			\item \verb*%pure%, \verb*%malloc%
+			\item \verb*%noinline%, \verb*%alwaysinline%
+			\item \verb*%target% - multiversioning, demo w \texttt{vec.cpp}
+			\item \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Function-Attributes.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Type-Attributes.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Variable-Attributes.html}
+		\end{itemize}
 	\end{block}
 \end{frame}

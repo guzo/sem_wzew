@@ -3,21 +3,22 @@
 \begin{frame}[fragile]{Założenia}
 	\begin{block}{Skrótowo}
 		\begin{itemize}
-			\item Single-thread performance
-			\item \verb*%x86{,-64}%
-			\item \verb%C{89,99}%, \verb%C++{03,11}%, assembler \verb%x86_64%
+			\item Single-thread performance.
+			\item \verb*%x86{,_64}%.
+			\item \verb%C{89,99}%, \verb%C++{03,11}%, assembler \verb%x86_64%.
 			\begin{itemize}
-				\item raczej standard, ale też kilka rozszerzeń GNU
+				\item Raczej standard, ale też kilka rozszerzeń GNU.
 			\end{itemize}
-			\item nie wszystko zdążymy, ale powiemy gdzie doczytać
+			\item Nie wszystko zdążymy omówić, ale powiemy gdzie doczytać.
+			\item Będzie trochę ,,skakania'': dużo zależności, trudno rozsądnie podzielić..
 		\end{itemize}
 	\end{block}
 	\begin{block}{Przykłady}
 		\begin{itemize}
-			\item Nie wszędzie z pomiarem czasu - niektóre optymalizacje zbyt drobne
-			\item Kilka większych - staramy się aby były praktyczne
-			\item Udostępnimy kod
-			\item kilka zagadnień się powtórzy, bo zaatakujemy je z różnych stron
+			\item Nie wszędzie z pomiarem czasu - niektóre optymalizacje zbyt drobne.
+			\item Kilka większych - staramy się aby były praktyczne.
+			\item Udostępnimy kod.
+			\item Kilka zagadnień się powtórzy, bo zaatakujemy je z różnych stron.
 		\end{itemize}
 	\end{block}
 \end{frame}
@@ -27,7 +28,7 @@
 		\begin{itemize}
 			\item Optymalizacja nie jest procesem bezmyślnym, to współpraca
 			pomiędzy człowiekiem, softwarem i hardwarem.
-			\item Należy wiedzieć kiedy i gdzie ją stosować.
+			\item Należy wiedzieć kiedy, gdzie, jak i co.
 		\end{itemize}
 	\end{block}
 	\only<1>{
@@ -35,7 +36,7 @@
 		\begin{quote}
 			"Premature optimization is the root of all evil" - Donald Knuth
 		\end{quote}
-		\begin{enumerate} % FIXME: quotesource
+		\begin{enumerate}
 			\item Get it right
 			\item Test it's right
 			\item Profile if slow
@@ -46,30 +47,24 @@
 	\end{block} }
 	\only<2>{
 	\begin{block}{Kiedy 2/2}
-		\begin{itemize}
-			\item Prawo Amdahla (powtórka) - Zwiększenie szybkości wykonywania się programu
-			przy użyciu wielu procesorów w obliczeniach równoległych jest ograniczane przez
-			czas potrzebny do sekwencyjnego dzielenia programu.
-			\item Jeżeli kod składa się w 25\% z instrukcji sekwencyjnych, to maksymalne przyspieszenie
-			 dla n procesorów wynosi 4x.
-		\end{itemize}
+		Prawo Amdahla (powtórka) - opisuje wpływ $k$-krotnego przyspieszenia fragmentu programu na przyspieszenie globalne
+		$$S(n,k) :\equiv \frac{t_s(n)}{t_p(n,k)} :\equiv \frac{t_s(n)}{\left ( s(n) + \frac{p(n)}{k} \right ) t_s(n)} = \frac{1}{s(n) + \frac{p(n)}{k}}$$
+		$$S_{max}(n) = \lim\limits_{k \to \infty} S(n,k) = \frac{1}{s(n)} = \frac{1}{1-p(n)}$$
+		co w szczególności oznacza że nawet w nieskończoności nie osiągniemy więcej niż $S_{max} = 5$ przy (nader korzystnym) $(s(n), p(n)) = (0.2, 0.8)$.
 	\end{block} }
 	\defverbatim{\imullst}{ %FIXME: dirty workaround I don't yet understand
 		\begin{cpp}
-			val = val*12;
+			val = val*10;
 			//vs
 			val = (val<<3) + (val<<2);
 		\end{cpp}}
 	\only<3>{
 	\begin{block}{Gdzie}
 		\begin{itemize}
-			\item Czasami intuicja podpowiada nam które fragmenty kodu mogą wymagać
-			optymalizacji.Nie należy się domyślać, należy profilować!
-			\item Profilować można nie tylko czas wykonania (gprof), ale także wykorzystanie
-			cache'u (cachegrind).
-			\item Jednak niektóre optymalizacje lepiej zostawić kompilatorowi.
-			\item Co wykona się szybciej?
-
+			\item Czasami intuicja podpowiada nam które fragmenty kodu mogą wymagać optymalizacji.
+			Nie należy się domyślać, należy profilować!
+			\item Profilować można nie tylko czas wykonania (np. \texttt{gprof}), ale także wykorzystanie cache'a (\texttt{cachegrind}).
+			\item Niektóre optymalizacje lepiej zostawić kompilatorowi. Przykład: Co wykona się szybciej?
 			\imullst
 			\url{http://stackoverflow.com/questions/6120207/}
 		\end{itemize}
@@ -79,9 +74,9 @@
 \begin{frame}{Optymalizacja}
 	\begin{block}{Nazwa}
 		\begin{itemize}
-			\item trudno nawet marzyć o optimum
-			\item stosowane techniki czasem wzajemnie się ,,znoszą'' - bardzo nieliniowy proces
-			\item stąd superoptymalizacja: małe podproblemy, przeszukiwanie całej przestrzani rozwiązań i przerażające bithacki
+			\item Trudno nawet marzyć o optimum.
+			\item Stosowane techniki czasem wzajemnie się ,,znoszą'' - bardzo nieliniowy proces.
+			\item Stąd superoptymalizacja: małe podproblemy, przeszukiwanie całej przestrzeni rozwiązań i przerażające bithacki.
 		\end{itemize}
 		\begin{quote}
 			Given an instruction set, the superoptimizer finds the shortest program to compute a function.
@@ -100,8 +95,7 @@
 				\item Na jakim sprzęcie?
 				\item Na jakim rozmiarze danych? (QS vs. IS)
 				\item Co znaczy szybsze? (Performance? Throughput? Availability?)
-				\item Co nas spowalnia? (Pamięć? Obliczenia? IO?)
-				\item ,,There is no benchmark but your benchmark'' -- Alex Gaynor
+				\item Co nas spowalnia? Co możemy poświęcić? (Pamięć? Obliczenia? IO?): indeksy w bazach danych.
 			\end{itemize}
 			\item Mniejszy rozmiar pliku wykonywalnego ($\mu$C, embedded, shellcode) - czasem przyspiesza wykonanie przez lepsze wykorzystanie I\$ (\url{http://lwn.net/Articles/534735/}): \verb*%-Os%, \verb*%upx%
 			\item Łatwiejszy debug (vs. inlining/reordering/usuwanie kodu): \verb*%-O0%, \verb*%-Og%
@@ -110,19 +104,20 @@
 	\end{block}
 	\begin{block}{Rzadziej}
 		\begin{itemize}
-			\item Jakość obliczeń
+			\item Jakość obliczeń:
 			\begin{itemize}
-				\item \verb*%-ffast-math%, subnormale
-				\item MAD/FMA, powtarzalność
-				\item alternatywy dla reprezentacji zmiennoprzecinkowej (interval, fixed point)
+				\item \verb*%-ffast-math%, subnormale,
+				\item MAD/FMA, powtarzalność,
+				\item alternatywy dla reprezentacji zmiennoprzecinkowej (interval, double-double, fixed point).
+				\item Kahan summation algorithm
 			\end{itemize}
-			\item Zużycie energii (np. taniej liczyć niż przesyłać dane po chipie) %FIXME: quote CERNCARMA
-			\item Bezpieczeństwo - proof of work/salting/bcrypt i podobne jako ,,odwrotna optymalizacja na poziomie algorytmu''
-			\item Łatwość utrzymania kodu
+			\item Zużycie energii (czasem taniej liczyć od nowa niż przesyłać dane po chipie). %FIXME: quote CERNCARMA
+			\item Bezpieczeństwo - proof of work/salting/bcrypt i podobne jako ,,odwrotna optymalizacja na poziomie algorytmu''.
+			\item Łatwość utrzymania kodu.
 		\end{itemize}
 	\end{block}
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]{,,... przy utrzymaniu spodziewanego zachowania''}
 	,,Spodziewającym się'' jest Standard języka:
 	\begin{itemize}
@@ -178,20 +173,5 @@
 					\end{c99}
 			\end{itemize}
 	\end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FIXME: move somewhere (more) appropriate
-\begin{frame}{Pokrewne zagadnienia}
-	\begin{block}{Tyle się zmieściło, bo więcej nie weszło}
-		\begin{itemize}
-			\item Static code analysis
-			\item Object code optimization
-			\item Link-time optimization
-			\item Profile guieded optimization
-			\item Superoptimization
-			% FIXME realtime
-			% FIXME links to linktime
-		\end{itemize}
-	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

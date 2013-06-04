@@ -1,4 +1,17 @@
+#FIXME: matmul (cachegrind, plots), transpose, duff, plots
 #FIXME: zrodla
+	# inspiracja dla ins select: http://blog.regehr.org/archives/793
+	# -funswitch-loops: http://www.reddit.com/r/compsci/comments/155p3c/lesser_known_compiler_optimizations/c7jtfu3
+	# xor reg,reg, lea: http://www.nynaeve.net/?p=64
+#FIXME: reason why different results on 387
+#FIXME: newundef: http://lwn.net/Articles/278137/, http://blog.regehr.org/archives/759
+#FIXME: latin compiler in slides
+#FIXME: ~"dependency removal":\url{http://blog.llvm.org/2013/05/llvm-33-vectorization-improvements.html}
+#FIXME: -Ofast
+#FIXME: clang, gcc: -fwrapv, -ftrapv, -fomit-frame-pointer -fno-stack-protector 
+#FIXME: Comparing Compiler Optimizations: http://blog.regehr.org/archives/320
+#FIXME: ew. zalety z wiecej rejestrow na x86: testy z -m{{x,}32,64}
+#FIXME: clang: -fcatch-undefined-behavior
 #FIXME: declarative: give up scheduling
 #FIXME: turn of ASLR: echo 0 > /proc/sys/kernel/randomize_va_space
 
@@ -59,7 +72,7 @@ o czym mowa
 					potrzebna wysoka (np. dla nauki):
 						https://en.wikipedia.org/wiki/Kahan_summation_algorithm
 						alternatywy dla FP
-							 {interval,ball} arithmetics/fixed point
+							 {interval,double-double} arithmetics/fixed point
 						MAD/FMA
 						wolne subnormale
 					wystarczy niska (np. dla grafiki): -ffast-math
@@ -212,6 +225,7 @@ co mozna wykorzystac
 						zapobiegawcze podejcie kompilatorow (sse, nie tylko)
 							przekompilowanie strength_reduction.c z -m32
 						gcc -mx32: http://en.wikipedia.org/wiki/X32_ABI
+						latwiejsze tworzenie PIC: adresowanie wzgledem RIP
 	jezyk
 		both: C i C++ - IMPORTANT
 			wbrew pozorom (jeszcze bardziej) skomplikowany jezyk
@@ -237,6 +251,7 @@ co mozna wykorzystac
 							http://dbp-consulting.com/tutorials/StrictAliasing.html
 						rationale
 							zeby dalo sie korzystac z rejestrow a nie paranoja ze kazdy ptrwrite psuje wszystko
+							Type Based Alias Analysis
 						rozwiazania
 							memcpy
 								traktowane przez sprytny kompilator jako hint i wywalane
@@ -257,7 +272,9 @@ co mozna wykorzystac
 					reprezentacja specjalnych wartosci (np. true/false)
 						src/undef/true_true.c
 						ieee754, leaky abstractions (NIE undefined behavior)
-				http://stackoverflow.com/questions/98340/what-are-the-common-undefined-unspecified-behavior-for-c-that-you-run-into
+					links:
+						http://blog.llvm.org/2011/05/what-every-c-programmer-should-know.html
+						http://stackoverflow.com/questions/98340/what-are-the-common-undefined-unspecified-behavior-for-c-that-you-run-into
 			slowa kluczowe
 				register/volatile
 				static (functions) - aggressive inlining/extern
@@ -334,15 +351,15 @@ co mozna wykorzystac
 				demo: mandel + diffy z -ffastmath, -mfpmath=? i out z vector, byc moze profiler
 				demo: cachegrind na himrbp
 			wysek: wspolpraca z kompilatorem - IMPORTANT
-				intristics/builtins
+				intrinsics/builtins
 					__builtin_expect (G_UNLIKELY)
 						-fprofile-arcs
 					__builtin_cpu_supports("sse2") //gcc-4.8
 					vectorization
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Vector-Extensions.html
 						http://gcc.gnu.org/projects/tree-ssa/lno.html
-						src/vec/sse.cpp
 						http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/X86-Built_002din-Functions.html
+						src/vec/sse.cpp
 					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Target-Builtins.html
 					http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Other-Builtins.html
 				language extension
@@ -491,6 +508,7 @@ porownanie, demo typowych optymalizacji - luzny, niezobowiazujacy podzial
 						row/column major
 					loop fusion/fission
 			drobne - prawdopodobnie sliding window
+				ogólnie: induction variables
 				factoring out of invariants
 				loop-invariant code motion
 					int s = 0; for(int i; i < n; i++) s+=5; => int s = n*5
