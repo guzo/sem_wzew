@@ -8,7 +8,7 @@
 #FIXME: latin compiler in slides
 #FIXME: ~"dependency removal":\url{http://blog.llvm.org/2013/05/llvm-33-vectorization-improvements.html}
 #FIXME: -Ofast
-#FIXME: clang, gcc: -fwrapv, -ftrapv, -fomit-frame-pointer -fno-stack-protector 
+#FIXME: clang, gcc: -fwrapv, -ftrapv, -fomit-frame-pointer -fno-stack-protector
 #FIXME: Comparing Compiler Optimizations: http://blog.regehr.org/archives/320
 #FIXME: ew. zalety z wiecej rejestrow na x86: testy z -m{{x,}32,64}
 #FIXME: clang: -fcatch-undefined-behavior

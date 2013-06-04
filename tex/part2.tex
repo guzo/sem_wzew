@@ -83,43 +83,38 @@
 			a = __builtin_shuffle(a+b, s);
 			a = __builtin_ia32_rsqrtps(a);
 		\end{cpp}
-		\url{http://software.intel.com/en-us/articles/intel-intrinsics-guide}
 	\end{block}
 	\begin{block}{Nagłówki INTELa: przenośne między kompilatorami, ale nie architekturami}
-		Popularne kompilatory mają swoje wersje, opakowujące swoje rozszerzenia
 		\begin{verbatim}
-		//MMX    :  <mmintrin.h>
-		//SSE    : <xmmintrin.h>
-		//SSE2   : <emmintrin.h>
-		//SSE3   : <pmmintrin.h>
-		//SSSE3  : <tmmintrin.h>
-		//SSE4.1 : <smmintrin.h>
-		//AES    : <wmmintrin.h>
-		//AVX    : <avxintrin.h>
+		//MMX    :  <mmintrin.h> SSE    : <xmmintrin.h>
+		//SSE2   : <emmintrin.h> SSE3   : <pmmintrin.h>
+		//SSSE3  : <tmmintrin.h> SSE4.1 : <smmintrin.h>
+		//AES    : <wmmintrin.h> AVX    : <avxintrin.h>
 		#include <x86intrin.h> //META
-		#if
+		__m128 i = _mm_load_ps(addr)
 		\end{verbatim}
+		\url{http://software.intel.com/en-us/articles/intel-intrinsics-guide}
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile]{Przykład: clang 3.3}
 	\begin{cpp}
 	int sum_elements(int *A, int n) {
-		int sum = 0;
-		for(int i = 0; i < n; ++i)
-			sum += A[i];
-		return sum;
+	    int sum = 0;
+	    for(int i = 0; i < n; ++i)
+	        sum += A[i];
+	    return sum;
 	}
 	\end{cpp}
 	\begin{verbatim}
 	% ...
 	LBB0_4:
-		movdqu    16(%rdi,%rax,4), %xmm2
-		paddd     %xmm2, %xmm1
-		movdqu    (%rdi,%rax,4), %xmm2
-		paddd     %xmm2, %xmm0
-		addq      $8, %rax
-		cmpq      %rax, %rcx
+	    movdqu    16(%rdi,%rax,4), %xmm2
+	    paddd     %xmm2, %xmm1
+	    movdqu    (%rdi,%rax,4), %xmm2
+	    paddd     %xmm2, %xmm0
+	    addq      $8, %rax
+	    cmpq      %rax, %rcx
 	jne       LBB0_4
 	% ...
 	\end{verbatim}
