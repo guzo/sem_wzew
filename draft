@@ -1,3 +1,6 @@
+#OMG: -floop-block
+
+
 #FIXME: matmul (cachegrind, plots), transpose, duff, plots
 #FIXME: zrodla
 	# inspiracja dla ins select: http://blog.regehr.org/archives/793

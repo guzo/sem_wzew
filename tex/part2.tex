@@ -76,12 +76,12 @@
 	\begin{block}{Compiler intrinsics: GCC}
 		\begin{cpp}
 			typedef float v4f __attribute__ (( vector_size(4*4) ));
-			v4f a = {3,2,32,8};
+			v4f a = {3,2,32,8}; //__m128
 			v4f b = {1,2,32,8};
 			v4i s = {3,2,1,0};
-			v4i e = (a == b); // -1 :== all bits set
-			a = __builtin_shuffle(a+b, s);
-			a = __builtin_ia32_rsqrtps(a);
+			v4i e = (a == b); // -1 := all bits set, _mm_cmpeq_ps
+			a = __builtin_shuffle(a+b, s); //_mm_shuffle_ps
+			a = __builtin_ia32_rsqrtps(a); //_mm_rsqrt_ps
 		\end{cpp}
 	\end{block}
 	\begin{block}{Nagłówki INTELa: przenośne między kompilatorami, ale nie architekturami}
@@ -91,7 +91,7 @@
 		//SSSE3  : <tmmintrin.h> SSE4.1 : <smmintrin.h>
 		//AES    : <wmmintrin.h> AVX    : <avxintrin.h>
 		#include <x86intrin.h> //META
-		__m128 i = _mm_load_ps(addr)
+		__m128 v = _mm_load_ps(addr)
 		\end{verbatim}
 		\url{http://software.intel.com/en-us/articles/intel-intrinsics-guide}
 	\end{block}

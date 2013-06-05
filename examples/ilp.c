@@ -24,7 +24,7 @@ uint64_t sum(char* a, size_t n) {
 }
 
 int main() {
-	size_t sz = 258*1024*1024;
+	size_t sz = 256*1024*1024;
 	char* a = memset(malloc(sz), 0x01, sz);
 	clock_t start,end; uint64_t s;
 	start = clock(); s = sum_ilp(a,sz); end = clock();

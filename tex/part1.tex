@@ -9,6 +9,7 @@
 			\item ,,memory wall'' - kiedyś dostęp do pamięci był tani, a obliczenia drogie. Teraz jest odwrotnie.
 			\item ,,latency wall'': w czasie, kiedy wystarcza na podwojenie przepustowości procesorów/pamięci/dysków/sieci opóźnienia spadają tylko 1.2-1.3$\times$ (David A. Patterson : ,,Latency lags bandwith'')
 			\item ,,speed wall'': $c \approx 3e8\frac{m}{s} \approx 10 \frac{cm}{clk}~@3GHz$ - w próźni
+			\item na co wykorzystać tranzystory?
 		\end{itemize}
 	\end{block}
 	\begin{block}{Decyzje}
@@ -29,13 +30,13 @@
 			L3  ~  50-100clk
 			mem ~ 100-400clk
 		\end{verbatim}
-		\item Hierarchiczny cache (per-core, współdzielony LLC, ,,harwardzki TLC'', CC: MESI i pokrewne)
+		\item Hierarchiczny cache (per-core, TLC: I\$ i D\$, współdzielony LLC, CC: MESI i pokrewne)
 		\begin{itemize}
-			\item page coloring
 			\item HS vs. QS
-			\item później demo: ,,Gallery of processor cache effects''
-			\item cache oblivious algorithms
 			\item cachegrind
+			\item cache oblivious algorithms
+			\item \url{igoro.com/archive/gallery-of-processor-cache-effects/}
+			\item page coloring
 		\end{itemize}
 		\item Hierarchiczny TLB
 	\end{itemize}
@@ -70,6 +71,8 @@
 		\end{itemize}
 		\item cache miss == pipeline stall: OOO, HW threads, superscalar
 	\end{itemize}
+	\tiny\url{http://www.infoq.com/presentations/click-crash-course-modern-hardware}
+	\tiny\url{http://www.gamedev.net/page/resources/_/technical/general-programming/a-journey-through-the-cpu-pipeline-r3115}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{SIMD}
@@ -87,6 +90,7 @@
 			\item Nowe rejestry: \textbf{SIMD} i \textbf{general purpose} (tych $2\times$ więcej niż w x86)
 			\item Nowe instrukcje dla tychże
 			\item Większe rejestry: większe zmienne, większa przestrzeń adresowa (tak wirtualna jak i fizyczna, tak w trybie 64-bitowym jak i w PAE)
+			\item Śmielsze kompilatory
 			\item Łatwiejsze tworzenie PIC: adresowanie wzgledem RIP
 			\item Bit \texttt{NX}
 		\end{itemize}
@@ -143,13 +147,14 @@
 		\item Type Based Alias Analysis
 		\item value representation (\verb*%true_true.c%)
 		\item rationale
+		\item \url{http://dbp-consulting.com/tutorials/StrictAliasing.html}
 	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[fragile, allowframebreaks]{Jak C pomaga programiście pomóc sobie}
 	\begin{itemize}
 		\item \verb*%register%/\verb*%volatile%
-		\item \verb*%static%/\verb*%auto%/\verb*%extern%
+		\item \verb*%static%
 		\item \verb*%switch% - ,,most high-level feature of C''
 		\item \verb*%restrict% (\verb*%C99%)
 		\item \verb*%inline%/\verb*%const%/\verb*%constexpr%/\verb*%extern%
@@ -158,21 +163,21 @@
 			\item vs. \verb*%template% (unrolling)
 			\item vs. rekursja, \verb*%&%, \verb*%vla%, \verb*%-fno-inline%
 		\end{itemize}
-		\item typy: jak (wg. standardu) ma się \verb*%int% do \verb*%long% i \verb*%short%? \verb*%<stdiont.h>%, \verb*%int_fast*_t%
+		\item typy: jak (wg. standardu) ma się \verb*%int% do \verb*%long% i \verb*%short%? \verb*%<stdint.h>%, \verb*%int_fast*_t%
 		\item RVO/copy elision
 		\item \verb*%C++11%: \verb*%alignof%/\verb*%alignas%, \verb*%noexcept%, move semantics, optymalizacja exception handling
 	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Biblioteki}
-\begin{frame}[fragile]{Kompilator}
+\begin{frame}[fragile]{Biblioteki}
 	\begin{itemize}
 		\item SSO
-		\item COW
+		\item COW (lazy copy)
 		\item GPU
-		\item problem z fuzją - Halide
 		\item nie zawsze należy ufać (,,Three Beautiful Quicksorts'')
 		\item builtins
+		\item problem z fuzją - Halide
 	\end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,7 +191,7 @@
 			\item Generowany kod:
 			\begin{itemize}
 				\item \verb*%-p[g]%, PGO: \texttt{-fprofile-generate}, \texttt{-fprofile-use}
-				\item \verb*%-g[gdb], -Og%, warningi
+				\item \verb*%-g[gdb]% \verb*%-Og%, warningi
 				\item \verb*%-O{0,1,2,3,s,fast}%, \verb*%-ffast-math%
 				\item \verb*%-m{32,x32,64}%, \verb*%-mtune=*%, \verb*%-mfpmath={387,sse}%, \verb*%-m{96,128}bit-long-double%
 				\item \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Optimize-Options.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/i386-and-x86_002d64-Options.html}, \url{http://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Code-Gen-Options.html}
@@ -195,8 +200,8 @@
 			\begin{itemize}
 				\item \texttt{-fstack-usage}
 				\item \texttt{-ftree-vectorizer-verbose=*}
-				\item \texttt{-fdump-tree-{vectorize,optimize}=stderr=*}
-				\item \texttt{-fdump-tree-{optimized,vec-missed}=stderr=*}
+				\item \texttt{-fdump-tree-\{vectorize,optimize\}=stderr=*}
+				\item \texttt{-fopt-info-\{optimized,vec-missed\}=stderr=*}
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
@@ -227,11 +232,11 @@
 	\end{block}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[fragile, allowframebreaks]{Kompilator: intrinsics}
+\begin{frame}[fragile, allowframebreaks]{Kompilator}
 	\begin{block}{Attributes}
-		Pozwala nadawać atrybuty specjalne zmiennym, strukturom danych, typom, funkcjom. Wygodniejsza składnia, podobna konstrukcja w \texttt{C++11}
+		Wygodniejsza składnia, podobna konstrukcja w \texttt{C++11}
 		\begin{itemize}
-			\item \verb*%aligned% \verb*%packed%
+			\item \verb*%aligned%, \verb*%packed%
 			\item \verb*%fastcall%
 			\item \verb*%noreturn%
 			\item \verb*%pure%, \verb*%malloc%
